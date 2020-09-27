@@ -11,6 +11,7 @@ const config: GatsbyConfig = {
     keywords: ["gatsby", "starter", "gatsby.js", "template", "antoine", "antoinerousseau", "typescript"],
   },
   plugins: [
+    'boardgame-data-plugin',
     {
       resolve: `gatsby-source-filesystem`,
       options: {

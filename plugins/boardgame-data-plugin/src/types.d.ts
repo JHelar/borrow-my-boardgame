@@ -1,4 +1,4 @@
-export type ObjectType = 'things' | 'person' | 'company'
+export type ObjectType = 'thing' | 'person' | 'company' | 'version' | 'property' | 'family'
 
 export interface Boardgame extends BoardgameInfo, BoardgameDetails {}
 
