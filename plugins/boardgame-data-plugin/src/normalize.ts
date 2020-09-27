@@ -73,7 +73,17 @@ export const linkBoardgamesAndDesigners = (games: NormalizedBoardgame[], designe
 		game.info = Object.entries(game.links).reduce((acc, [key, value]) => {
 			return {
 				...acc,
-				[`${key.replace('boardgame', '')}___NODE`]: value.map((d: BoardgameDesigner) => designers.find(n => n.objectid === d.objectid)?.id).filter(Boolean) as string[]
+				[`${key.replace('boardgame', '')}___NODE`]: value.map((d: BoardgameDesigner) => {
+					const entity = designers.find(n => n.objectid === d.objectid)
+
+					// We want the boardgame reference and not designer reference
+					if(entity.__type === 'thing') {
+						// Find the boardgame
+						const referencedGame = games.find(g => g.objectId.toString() === d.objectid)
+						return referencedGame?.id
+					}
+					return entity.id
+				}).filter(Boolean) as string[]
 			}
 		}, {} as DesignerNodes)
 	})
