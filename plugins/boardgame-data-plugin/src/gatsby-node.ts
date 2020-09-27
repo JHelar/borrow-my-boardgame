@@ -1,33 +1,31 @@
 import { GatsbyCache, GatsbyNode, SourceNodesArgs } from 'gatsby'
 import { getGameDetails } from './api'
-import { linkBoardgamesAndDesigners, normalizeBoardgameEntity, normalizeDesignerEntity } from './normalize'
+import {
+  linkBoardgamesAndDesigners,
+  normalizeBoardgameEntity,
+  NormalizedBoardgame,
+  NormalizedDesigner,
+  normalizeDesignerEntity,
+} from './normalize'
 import { getBoardGameLinks } from './scraper'
 import { Boardgame, BoardgameDesigner, BoardgameInfo } from './types'
 
-const getBoardgame = async (info: BoardgameInfo, cache: GatsbyCache) => {
-  const cachedDetails = await cache.get(`${info.objectId}`)
-  if (cachedDetails) {
-    return {
-      ...info,
-      ...cachedDetails,
-    } as Boardgame
-  }
+const getBoardgame = async (info: BoardgameInfo) => {
   const gameDetails = await getGameDetails(info.objectId).catch((getGameDetailsError) => {
     console.error({
       getGameDetailsError,
     })
     return null
   })
-  await cache.set(`${info.objectId}`, gameDetails)
   return {
     ...gameDetails,
     ...info,
   } as Boardgame
 }
 
-const getBoardgames = async (cache: GatsbyCache) => {
+const getBoardgames = async () => {
   const gameBoardLinks = await getBoardGameLinks()
-  const games = (await Promise.all(gameBoardLinks.map(async (info) => getBoardgame(info, cache)))).filter(
+  const games = (await Promise.all(gameBoardLinks.map(async (info) => getBoardgame(info)))).filter(
     Boolean
   ) as Boardgame[]
 
@@ -50,10 +48,9 @@ export const sourceNodes: GatsbyNode['sourceNodes'] = async (args: SourceNodesAr
   const {
     actions: { createNode },
     createContentDigest,
-    cache,
   } = args
 
-  const boardgames = await getBoardgames(cache)
+  const boardgames = await getBoardgames()
   const designers = parseDesigners(boardgames)
 
   const normalizedGames = boardgames.map((game) => normalizeBoardgameEntity(game, args))
