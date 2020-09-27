@@ -1,26 +1,33 @@
-import React from "react"
-import { Link } from "gatsby"
+import React from 'react'
+import { Link } from 'gatsby'
 
-import Layout from "src/layout"
-import Image from "src/components/Image"
+import Layout from 'src/layout'
 
-import { graphql } from "gatsby"
+import { graphql } from 'gatsby'
 
 type GameThumbnail = {
-  id: string
-  name: string
-  images: {
-    thumb: string
+  node: {
+    id: string
+    name: string
+    fields: {
+      slug: string
+    }
+    images: {
+      thumb: string
+    }
   }
 }
 type HomePageData = {
   allBoardgame: {
-    nodes: GameThumbnail[]
+    edges: GameThumbnail[]
   }
 }
 
-const GameThumbnail = (game: GameThumbnail) => (
-  <div><img src={game.images.thumb} alt="" />{game.name}</div>
+const GameThumbnail = ({ node: game }: GameThumbnail) => (
+  <Link to={game.fields.slug}>
+    <img src={game.images.thumb} alt="" />
+    {game.name}
+  </Link>
 )
 
 const HomePage: GatsbyPage<HomePageData> = ({ data }) => (
@@ -28,21 +35,28 @@ const HomePage: GatsbyPage<HomePageData> = ({ data }) => (
     <h1>Wellcome to BmB</h1>
     <h2>Top ranking games</h2>
     <ul>
-      {
-        data.allBoardgame.nodes.map(game => <li key={game.id}><GameThumbnail {...game}/></li>)
-      }
+      {data.allBoardgame.edges.map((edge) => (
+        <li key={edge.node.id}>
+          <GameThumbnail {...edge} />
+        </li>
+      ))}
     </ul>
   </Layout>
 )
 
 export const query = graphql`
   query {
-    allBoardgame(limit: 10, sort: {fields: rank, order: ASC}) {
-      nodes {
-        id
-        name
-        images {
-          thumb
+    allBoardgame(limit: 10, sort: { fields: rank, order: ASC }) {
+      edges {
+        node {
+          id
+          name
+          fields {
+            slug
+          }
+          images {
+            thumb
+          }
         }
       }
     }
