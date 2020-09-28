@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import puppeteer, { Page } from 'puppeteer'
+import { saveGamesExists } from '../saveGames'
 import { BoardgameInfo } from '../types'
 
 const url = 'https://boardgamegeek.com/browse/boardgame/page/'
@@ -48,7 +49,11 @@ const scrapeGames = async (page: Page, pageNo: number) => {
   return boardGameLinks
 }
 
-export const getBoardGameLinks = async function* (): AsyncGenerator<{ links: BoardgameInfo[]; pageNo: number }> {
+export const getBoardGameLinks = async function* (): AsyncGenerator<{
+  links: BoardgameInfo[]
+  pageNo: number
+  saveExists: boolean
+}> {
   const browser = await puppeteer.launch({
     args: [
       '--disable-gpu',
@@ -71,16 +76,31 @@ export const getBoardGameLinks = async function* (): AsyncGenerator<{ links: Boa
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
     )
-    const pageNo = 1
-    while (true) {
-      const boardGameLinks = await scrapeGames(page, pageNo)
-      if (boardGameLinks && boardGameLinks.length) {
-        console.log(`Found ${boardGameLinks.length} games on page ${pageNo}`)
+    let pageNo = 1
+    const limit = process.env.NODE_ENV === 'develop' ? 4 : Infinity
+    while (pageNo < limit) {
+      const saveExists = saveGamesExists(pageNo)
+      if (saveExists) {
+        console.log(`Page ${pageNo} already saved, clean cache if you want to refetch`)
         yield {
-          links: boardGameLinks,
+          links: [],
           pageNo,
+          saveExists,
+        }
+      } else {
+        const boardGameLinks = await scrapeGames(page, pageNo)
+        if (boardGameLinks && boardGameLinks.length) {
+          console.log(`Found ${boardGameLinks.length} games on page ${pageNo}`)
+          yield {
+            links: boardGameLinks,
+            pageNo,
+            saveExists: false,
+          }
+        } else {
+          break
         }
       }
+      pageNo++
     }
   } catch (error) {
     console.log(error)

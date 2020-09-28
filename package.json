@@ -24,7 +24,7 @@
     "url": "https://github.com/antoinerousseau/gatsby-starter-antoine/issues"
   },
   "scripts": {
-    "develop": "gatsby develop",
+    "develop": "export NODE_ENV=develop && gatsby develop",
     "lint": "tsc --skipLibCheck && eslint --fix \"**/*.{ts,tsx,js,jsx,json}\"",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "build": "gatsby clean && gatsby build",

@@ -1,12 +1,6 @@
-import { GatsbyCache, GatsbyNode, SourceNodesArgs } from 'gatsby'
+import { GatsbyNode, SourceNodesArgs } from 'gatsby'
 import { getGameDetails } from './api'
-import {
-  linkBoardgamesAndDesigners,
-  normalizeBoardgameEntity,
-  NormalizedBoardgame,
-  NormalizedDesigner,
-  normalizeDesignerEntity,
-} from './normalize'
+import { linkBoardgamesAndDesigners, normalizeBoardgameEntity, normalizeDesignerEntity } from './normalize'
 import { getGamesFromSaveFile, saveGamesToSaveFile } from './saveGames'
 import { getBoardGameLinks } from './scraper'
 import { Boardgame, BoardgameDesigner, BoardgameInfo } from './types'
@@ -27,9 +21,14 @@ const getBoardgame = async (info: BoardgameInfo) => {
 const getBoardgames = async () => {
   let allLinks: Boardgame[] = []
   const boardgameLinks = getBoardGameLinks()
-  for await (const { links, pageNo } of boardgameLinks) {
-    const games = (await Promise.all(links.map(async (info) => getBoardgame(info)))).filter(Boolean) as Boardgame[]
-    await saveGamesToSaveFile(pageNo, games)
+  for await (const { links, pageNo, saveExists } of boardgameLinks) {
+    let games: Boardgame[] = []
+    if (saveExists) {
+      games = await getGamesFromSaveFile(pageNo)
+    } else {
+      games = (await Promise.all(links.map(async (info) => getBoardgame(info)))).filter(Boolean) as Boardgame[]
+      await saveGamesToSaveFile(pageNo, games)
+    }
     allLinks = [...allLinks, ...games]
   }
 
