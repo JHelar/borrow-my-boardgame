@@ -7,6 +7,7 @@ import {
   NormalizedDesigner,
   normalizeDesignerEntity,
 } from './normalize'
+import { getGamesFromSaveFile, saveGamesToSaveFile } from './saveGames'
 import { getBoardGameLinks } from './scraper'
 import { Boardgame, BoardgameDesigner, BoardgameInfo } from './types'
 
@@ -24,12 +25,15 @@ const getBoardgame = async (info: BoardgameInfo) => {
 }
 
 const getBoardgames = async () => {
-  const gameBoardLinks = await getBoardGameLinks()
-  const games = (await Promise.all(gameBoardLinks.map(async (info) => getBoardgame(info)))).filter(
-    Boolean
-  ) as Boardgame[]
+  let allLinks: Boardgame[] = []
+  const boardgameLinks = getBoardGameLinks()
+  for await (const { links, pageNo } of boardgameLinks) {
+    const games = (await Promise.all(links.map(async (info) => getBoardgame(info)))).filter(Boolean) as Boardgame[]
+    await saveGamesToSaveFile(pageNo, games)
+    allLinks = [...allLinks, ...games]
+  }
 
-  return games
+  return allLinks
 }
 
 const parseDesigners = (gameboards: Boardgame[]) => {
