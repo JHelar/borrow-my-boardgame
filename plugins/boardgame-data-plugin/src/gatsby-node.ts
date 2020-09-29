@@ -36,15 +36,13 @@ const getBoardgames = async () => {
 }
 
 const parseDesigners = (gameboards: Boardgame[]) => {
-  const designerSet = new Set<BoardgameDesigner>()
+  const designerMap = new Map<string, BoardgameDesigner>()
   gameboards.forEach(({ links }) => {
     Object.values(links).forEach((designers: BoardgameDesigner[]) =>
-      designers.forEach((designer) => {
-        designerSet.add(designer)
-      })
+      designers.forEach((designer) => designerMap.set(`${designer.objecttype}-${designer.objectid}`, designer))
     )
   })
-  return [...designerSet]
+  return [...designerMap.values()]
 }
 
 export const sourceNodes: GatsbyNode['sourceNodes'] = async (args: SourceNodesArgs) => {

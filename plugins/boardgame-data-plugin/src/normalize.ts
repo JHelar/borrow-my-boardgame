@@ -1,9 +1,9 @@
 import { NodePluginArgs } from 'gatsby'
-import { Boardgame, BoardgameDesigner, ObjectType } from './types'
+import { Boardgame, BoardgameDesigner, Links, ObjectOurType, ObjectSourceType } from './types'
 
-export interface NormalizedDesigner extends Pick<BoardgameDesigner, 'name' | 'objectid'> {
+export interface NormalizedDesigner extends Pick<BoardgameDesigner, 'name' | 'objectid' | 'objecttype'> {
   id: string
-  __type: ObjectType
+  __type: ObjectSourceType
   boardgame___NODE: string[]
 }
 
@@ -50,6 +50,7 @@ export const normalizeDesignerEntity: NormalizeEntity<BoardgameDesigner> = (enti
     id: createNodeId(`${entity.objectid}-${entity.objecttype}`),
     __type: entity.objecttype,
     objectid: entity.objectid,
+    objecttype: entity.objecttype,
     name: entity.name,
     boardgame___NODE: [],
   }
@@ -83,38 +84,59 @@ export const normalizeBoardgameEntity: NormalizeEntity<Boardgame> = (entity, { c
   return normalized as any
 }
 
+const findDeisgnersAndAssignGame = (designers: NormalizedDesigner[]) => (
+  game: NormalizedBoardgame,
+  link: keyof Links,
+  type: ObjectSourceType,
+  mapDesignerType: ObjectOurType,
+  asGamesReferences?: NormalizedBoardgame[]
+) => {
+  const gameDesigners = designers.filter((designer) => {
+    const isDesigner =
+      designer.objecttype === type &&
+      game.links[link].some((boardgameDesigner) => boardgameDesigner.objectid === designer.objectid)
+    if (isDesigner) {
+      Object.assign(designer, {
+        boardgame___NODE: [...designer.boardgame___NODE, game.id],
+        __type: mapDesignerType,
+      })
+    }
+    return isDesigner
+  })
+
+  if (asGamesReferences) {
+    return asGamesReferences
+      .filter((gameReference) => gameDesigners.some((gd) => gd.objectid === gameReference.objectId.toString()))
+      .map(({ id }) => id)
+  }
+  return gameDesigners.map(({ id }) => id)
+}
+
 export const linkBoardgamesAndDesigners = (
   games: NormalizedBoardgame[],
   designers: NormalizedDesigner[]
 ): [NormalizedBoardgame[], NormalizedDesigner[]] => {
+  const designerFinder = findDeisgnersAndAssignGame(designers)
   games.forEach((game) => {
-    game.info = Object.entries(game.links).reduce((acc, [key, value]) => {
-      return {
-        ...acc,
-        [`${key.replace('boardgame', '')}___NODE`]: value
-          .map((d: BoardgameDesigner) => {
-            const entity = designers.find((n) => n.objectid === d.objectid)
+    const gameDesigners = designerFinder(game, 'boardgamedesigner', 'person', 'person')
+    const gameCategories = designerFinder(game, 'boardgamecategory', 'property', 'category')
+    const gameArtists = designerFinder(game, 'boardgameartist', 'person', 'person')
+    const gameExpansions = designerFinder(game, 'boardgameexpansion', 'thing', 'game', games)
+    const gameMechanics = designerFinder(game, 'boardgamemechanic', 'property', 'mechanic')
+    const gamePublishers = designerFinder(game, 'boardgamepublisher', 'company', 'publisher')
 
-            // We want the boardgame reference and not designer reference
-            if (entity.__type === 'thing') {
-              // Find the boardgame
-              const referencedGame = games.find((g) => g.objectId.toString() === d.objectid)
-              return referencedGame?.id
-            }
-            return entity.id
-          })
-          .filter(Boolean) as string[],
-      }
-    }, {} as DesignerNodes)
-  })
+    const info = {
+      designer___NODE: gameDesigners,
+      category___NODE: gameCategories,
+      artist___NODE: gameArtists,
+      expansion___NODE: gameExpansions,
+      mechanic___NODE: gameMechanics,
+      publisher___NODE: gamePublishers,
+    } as DesignerNodes
 
-  designers.forEach((designer) => {
-    const involvedGames = games.filter((game) =>
-      Object.values(game.info).some((gameDesigners) => gameDesigners.some((d) => d === designer.id))
-    )
-    if (involvedGames.length) {
-      designer.boardgame___NODE = involvedGames.map(({ id }) => id)
-    }
+    Object.assign(game, {
+      info,
+    })
   })
 
   return [games, designers]

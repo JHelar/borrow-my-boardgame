@@ -1,5 +1,5 @@
 import React from 'react'
-import { graphql } from 'gatsby'
+import { graphql, Link } from 'gatsby'
 import Layout from 'src/layout'
 
 type BoardgameData = {
@@ -11,8 +11,8 @@ type BoardgameData = {
         previewthumb: string
       }
       info: {
-        designer: { name: string; id: string }[]
-        category: { name: string; id: string }[]
+        designer: { name: string; id: string; fields: { slug: string } }[]
+        category: { name: string; id: string; fields: { slug: string } }[]
       }
     }
   }
@@ -32,9 +32,23 @@ const Boardgame = ({ data }: BoardgameData) => {
         <h1>{name}</h1>
         <div dangerouslySetInnerHTML={{ __html: description }}></div>
         <h2>Designer(s)</h2>
-        <ul>{designer && designer.map((d) => <li key={d.id}>{d.name}</li>)}</ul>
+        <ul>
+          {designer &&
+            designer.map((d) => (
+              <li key={d.id}>
+                <Link to={d.fields.slug}>{d.name}</Link>
+              </li>
+            ))}
+        </ul>
         <h2>Categories</h2>
-        <ul>{category && category.map((c) => <li key={c.id}>{c.name}</li>)}</ul>
+        <ul>
+          {category &&
+            category.map((c) => (
+              <li key={c.id}>
+                <Link to={c.fields.slug}>{c.name}</Link>
+              </li>
+            ))}
+        </ul>
       </div>
     </Layout>
   )
@@ -50,15 +64,17 @@ export const query = graphql`
       }
       info {
         designer {
-          ... on person {
-            name
-            id
+          name
+          id
+          fields {
+            slug
           }
         }
         category {
-          ... on property {
-            name
-            id
+          id
+          name
+          fields {
+            slug
           }
         }
       }

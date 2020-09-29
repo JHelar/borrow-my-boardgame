@@ -1,4 +1,6 @@
-export type ObjectType = 'thing' | 'person' | 'company' | 'version' | 'property' | 'family'
+export type ObjectOurType = 'game' | 'person' | 'publisher' | 'category' | 'mechanic'
+
+export type ObjectSourceType = 'thing' | 'person' | 'company' | 'version' | 'property' | 'family'
 
 export interface Boardgame extends BoardgameInfo, BoardgameDetails {}
 
@@ -9,7 +11,7 @@ export interface BoardgameInfo {
 
 export interface BoardgameDetails {
   itemid: number
-  objecttype: ObjectType
+  objecttype: ObjectSourceType
   objectid: number
   label: string
   labelpl: string
@@ -133,7 +135,7 @@ export interface Links {
 
 export interface BoardgameDesigner {
   name: string
-  objecttype: ObjectType
+  objecttype: ObjectSourceType
   objectid: string
   primarylink: number
   itemstate: string
