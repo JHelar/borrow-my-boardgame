@@ -1,7 +1,12 @@
-import React from "react"
-import styled from "styled-components"
+import React from 'react'
+import styled from '@emotion/styled'
+import { MAIN_BACKGROUND } from 'src/styles/colors'
 
-const Container = styled.footer``
+const Container = styled.footer`
+  width: 100%;
+  background: ${MAIN_BACKGROUND};
+  padding: 0 4%;
+`
 
 const Footer: React.FC = () => {
   return <Container>Footer</Container>

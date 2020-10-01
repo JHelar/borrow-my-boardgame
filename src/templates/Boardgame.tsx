@@ -8,7 +8,9 @@ type BoardgameData = {
       name: string
       description: string
       images: {
-        previewthumb: string
+        large: {
+          src: string
+        }
       }
       info: {
         designer: { name: string; id: string; fields: { slug: string } }[]
@@ -28,7 +30,7 @@ const Boardgame = ({ data }: BoardgameData) => {
   return (
     <Layout title={`BmB - ${name}`}>
       <div>
-        <img src={images.previewthumb} alt="" />
+        <img src={images.large.src} alt="" />
         <h1>{name}</h1>
         <div dangerouslySetInnerHTML={{ __html: description }}></div>
         <h2>Designer(s)</h2>
@@ -60,7 +62,9 @@ export const query = graphql`
       name
       description
       images {
-        previewthumb
+        large {
+          src
+        }
       }
       info {
         designer {

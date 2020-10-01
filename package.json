@@ -38,6 +38,8 @@
   "dependencies": {
     "@bugsnag/js": "^7.0.0",
     "@bugsnag/plugin-react": "^7.0.0",
+    "@emotion/core": "^10.0.35",
+    "@emotion/styled": "^10.0.27",
     "@hot-loader/react-dom": "^16.13.0",
     "@types/node": "12",
     "@types/react": "^16.9.34",
@@ -56,6 +58,7 @@
     "eslint-plugin-react-hooks": "^4.0.2",
     "gatsby": "^2.20.23",
     "gatsby-image": "^2.3.3",
+    "gatsby-plugin-emotion": "^4.3.12",
     "gatsby-plugin-google-analytics": "^2.2.3",
     "gatsby-plugin-manifest": "^2.3.4",
     "gatsby-plugin-react-helmet": "^3.2.3",

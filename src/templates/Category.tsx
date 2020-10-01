@@ -13,7 +13,9 @@ type QueryData = {
           slug: string
         }
         images: {
-          thumb: string
+          small: {
+            src: string
+          }
         }
         short_description: string
       }[]
@@ -33,7 +35,7 @@ const Category = ({ data }: QueryData) => {
           {boardgame.map((game) => (
             <li key={game.id}>
               <Link to={game.fields.slug}>
-                <img src={game.images.thumb} alt={game.name} />
+                <img src={game.images.small.src} alt={game.name} />
                 <h3>{game.name}</h3>
                 <p>{game.short_description}</p>
               </Link>
@@ -56,7 +58,9 @@ export const query = graphql`
           slug
         }
         images {
-          thumb
+          small {
+            src
+          }
         }
         short_description
       }

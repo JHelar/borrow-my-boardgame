@@ -67,16 +67,6 @@ export interface Square100 {
   'src@2x': string
 }
 
-export interface Images {
-  thumb: string
-  micro: string
-  square: string
-  squarefit: string
-  tallthumb: string
-  previewthumb: string
-  square200: string
-}
-
 export interface Website {
   url: string
   title: string
@@ -146,4 +136,56 @@ export interface Versioninfo {
   kickstarter_widget_url: string
   gamepageorderurl?: any
   shopifyitem?: any
+}
+
+export interface Images {
+  micro: Micro
+  small: Small
+  medium: Small
+  large: Large
+  square: Small
+  itempage: Micro
+  imagepage: Micro
+  imagepagezoom: Micro
+  expanded: Micro
+  crop100: Micro
+  square200: Micro
+  mediacard: Mediacard
+  original: Large
+}
+
+interface Mediacard {
+  url: string
+  src: string
+  'src@2x': string
+}
+
+interface Large {
+  url: string
+  src: string
+  width: number
+  height: number
+}
+
+interface Small {
+  url: string
+  src: string
+  'src@2x': string
+  width: number
+  height: number
+}
+
+interface Micro {
+  url: string
+  src: string
+}
+
+interface Source {
+  type: string
+  id: string
+}
+
+interface Dimensions {
+  width: number
+  height: number
 }

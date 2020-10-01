@@ -1,22 +1,23 @@
-import type { GatsbyConfig } from "gatsby"
+import type { GatsbyConfig } from 'gatsby'
 
-import path from "path"
+import path from 'path'
 
 const config: GatsbyConfig = {
   siteMetadata: {
-    title: `Gatsby Starter Antoine`,
-    description: `My opinionated Gatsby.js starter template`,
-    locale: `fr_FR`,
+    title: `BmB`,
+    description: `Borrow my boardgame is a site were you can borrow my boardgames!`,
+    locale: `en_GB`,
     siteUrl: `https://gatsby-starter-antoine.netlify.app`,
-    keywords: ["gatsby", "starter", "gatsby.js", "template", "antoine", "antoinerousseau", "typescript"],
+    keywords: ['gatsby', 'starter', 'gatsby.js', 'template', 'antoine', 'antoinerousseau', 'typescript'],
   },
   plugins: [
+    `gatsby-plugin-emotion`,
     'boardgame-data-plugin',
     {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `images`,
-        path: path.resolve(__dirname, "../images"),
+        path: path.resolve(__dirname, '../images'),
       },
     },
     `gatsby-transformer-sharp`,
@@ -43,7 +44,7 @@ const config: GatsbyConfig = {
     {
       resolve: `gatsby-plugin-styled-components`,
       options: {
-        displayName: process.env.NODE_ENV === "development",
+        displayName: process.env.NODE_ENV === 'development',
       },
     },
     {
