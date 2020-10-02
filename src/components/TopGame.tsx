@@ -19,7 +19,7 @@ type TopGameData = {
 const TopGameWrapper = styled.div<TopGameData>`
   position: relative;
   width: 100%;
-  height: 392px;
+  height: 56.25vw;
   background-image: ${({
     images: {
       large: { src },
@@ -40,16 +40,16 @@ const TopGameShadow = styled.div`
 
 const TopGameContent = styled.div`
   position: relative;
-  width: 50%;
+  width: 36%;
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 0 4%;
-  padding-top: 65px;
+  padding-top: ${56.25 / 4}vw;
 `
 
 const TopGameTitle = styled.h1`
-  font-size: 4rem;
+  font-size: 4vw;
   font-weight: bold;
   color: white;
   margin: 0;
@@ -57,7 +57,7 @@ const TopGameTitle = styled.h1`
 
 const TopGameDescription = styled.p`
   color: white;
-  font-size: 1rem;
+  font-size: 1.5vw;
   margin: 0;
 `
 
