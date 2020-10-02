@@ -2,6 +2,7 @@ import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import React, { useEffect, useRef, useState } from 'react'
 import { MAIN_BACKGROUND } from 'src/styles/colors'
+import { Motion, spring } from 'react-motion'
 
 type Game = {
   id: string
@@ -39,14 +40,14 @@ const ShelfItemContent = styled.div`
   position: absolute;
   width: 18vw;
   height: 16vw;
-  transform: translateY(-25%) translateX(-25%);
-  transform-origin: 50%;
   z-index: 2;
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 15px 4px black;
   overflow: hidden;
   border-radius: 5px;
+  left: -25%;
+  top: -50%;
 `
 
 const ShelfItemDetails = styled.div`
@@ -80,19 +81,9 @@ const ShelfItemDescription = styled.p`
 
 const ShelfItem = (game: Game) => {
   const [hovering, setHovering] = useState(false)
-  const [containerSize, setContainerSize] = useState<DOMRect>(null)
-  const containerRef = useRef<HTMLLIElement>(null)
-
-  useEffect(() => {
-    if (containerRef.current) {
-      const size = containerRef.current.getBoundingClientRect()
-      setContainerSize(size)
-    }
-  }, [hovering])
 
   return (
     <li
-      ref={containerRef}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       css={css`
@@ -105,23 +96,20 @@ const ShelfItem = (game: Game) => {
           flex-basis: 25%;
         }
       `}
-      style={
-        (hovering && {
-          width: containerSize.width,
-          height: containerSize.height,
-        }) ||
-        {}
-      }
     >
-      {!hovering && <ShelfItemImage {...game} />}
+      <ShelfItemImage {...game} />
       {hovering && (
-        <ShelfItemContent>
-          <ShelfItemContentImage {...game} />
-          <ShelfItemDetails>
-            <ShelfItemTitle>{game.name}</ShelfItemTitle>
-            <ShelfItemDescription>{game.short_description}</ShelfItemDescription>
-          </ShelfItemDetails>
-        </ShelfItemContent>
+        <Motion defaultStyle={{ x: 0 }} style={{ x: spring(1) }}>
+          {(interpolatedStyles) => (
+            <ShelfItemContent style={{ transform: `scale(${interpolatedStyles.x})` }}>
+              <ShelfItemContentImage {...game} />
+              <ShelfItemDetails>
+                <ShelfItemTitle>{game.name}</ShelfItemTitle>
+                <ShelfItemDescription>{game.short_description}</ShelfItemDescription>
+              </ShelfItemDetails>
+            </ShelfItemContent>
+          )}
+        </Motion>
       )}
     </li>
   )
