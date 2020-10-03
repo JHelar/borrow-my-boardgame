@@ -1,6 +1,9 @@
 import React from 'react'
-import { graphql, Link } from 'gatsby'
+import { graphql } from 'gatsby'
 import Layout from 'src/layout'
+import MoreInfoModal from 'src/components/MoreInfoModal'
+import { css } from '@emotion/core'
+import styled from '@emotion/styled'
 
 type BoardgameData = {
   data: {
@@ -20,6 +23,42 @@ type BoardgameData = {
   }
 }
 
+const BoardgameImage: React.FC<{ imageSrc: string }> = ({ imageSrc }) => (
+  <div
+    css={css`
+      padding-top: 56.3925%;
+      width: 100%;
+      background-image: url('${imageSrc}');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    `}
+  >
+    <div
+      css={css`
+        background-image: linear-gradient(to top, #181818, transparent 50%);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+      `}
+    ></div>
+  </div>
+)
+
+const BoardgameContent = styled.div`
+  padding: 0 3rem;
+`
+
+const BoardgameDescription = styled.p`
+  line-height: 27px;
+  font-size: 18px;
+  color: white;
+  margin-bottom: 0.5em;
+`
+
 const Boardgame = ({ data }: BoardgameData) => {
   const {
     name,
@@ -28,30 +67,13 @@ const Boardgame = ({ data }: BoardgameData) => {
     info: { designer, category },
   } = data.boardgame
   return (
-    <Layout title={`BmB - ${name}`}>
-      <div>
-        <img src={images.large.src} alt="" />
-        <h1>{name}</h1>
-        <div dangerouslySetInnerHTML={{ __html: description }}></div>
-        <h2>Designer(s)</h2>
-        <ul>
-          {designer &&
-            designer.map((d) => (
-              <li key={d.id}>
-                <Link to={d.fields.slug}>{d.name}</Link>
-              </li>
-            ))}
-        </ul>
-        <h2>Categories</h2>
-        <ul>
-          {category &&
-            category.map((c) => (
-              <li key={c.id}>
-                <Link to={c.fields.slug}>{c.name}</Link>
-              </li>
-            ))}
-        </ul>
-      </div>
+    <Layout title={`${name}`} lockScroll>
+      <MoreInfoModal>
+        <BoardgameImage imageSrc={images.large.src} />
+        <BoardgameContent>
+          <BoardgameDescription dangerouslySetInnerHTML={{ __html: description }}></BoardgameDescription>
+        </BoardgameContent>
+      </MoreInfoModal>
     </Layout>
   )
 }

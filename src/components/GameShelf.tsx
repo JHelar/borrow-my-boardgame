@@ -1,8 +1,9 @@
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { MAIN_BACKGROUND } from 'src/styles/colors'
-import { Motion, spring } from 'react-motion'
+import { useSpring, animated, config } from 'react-spring'
+import MoreInfoButton from './MoreInfoButton'
 
 type Game = {
   id: string
@@ -23,7 +24,7 @@ type GameShelfProps = {
   games: Array<Game>
 }
 
-const ShelfItemImage = styled.div<Pick<Game, 'images'>>`
+const ShelfItemImage = styled.div<Pick<Game, 'images'> & { hovering: boolean }>`
   background-image: url('${({
     images: {
       medium: { src },
@@ -31,86 +32,128 @@ const ShelfItemImage = styled.div<Pick<Game, 'images'>>`
   }) => src}');
   background-size: cover;
   background-position: center;
-  width: 100%;
-  height: 100%;
-  border-radius: 5px;
+  flex: 1 0 100%;
 `
 
-const ShelfItemContent = styled.div`
-  position: absolute;
-  width: 18vw;
-  height: 16vw;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 15px 4px black;
-  overflow: hidden;
-  border-radius: 5px;
-  left: -25%;
-  top: -50%;
-`
+const ShelfItemContent: React.FC<{ hovering: boolean; containerWidth: number }> = ({
+  hovering,
+  children,
+  containerWidth,
+}) => {
+  const [zIndex, setZIndex] = useState(hovering ? 2 : 1)
 
-const ShelfItemDetails = styled.div`
-  padding: 10px;
-  background: ${MAIN_BACKGROUND};
-  flex: 1;
-`
-const ShelfItemContentImage = styled.div<Pick<Game, 'images'>>`
-  background-image: url('${({
-    images: {
-      medium: { src },
-    },
-  }) => src}');
-  background-size: cover;
-  background-position: center;
-  flex: 0 0 60%;
-`
+  useEffect(() => {
+    if (hovering) {
+      setZIndex(2)
+    }
+  }, [hovering])
+  const onAnimationEnd = () => {
+    if (!hovering) {
+      setZIndex(1)
+    }
+  }
+
+  const props = useSpring({
+    height: hovering ? 400 : 125,
+    width: hovering ? 400 : containerWidth,
+    left: hovering ? -((400 - containerWidth) / 2) : 0,
+    top: hovering ? -((400 - 125) / 2) : 0,
+    onRest: onAnimationEnd,
+  })
+  return (
+    <animated.div
+      style={props}
+      css={css`
+        z-index: ${zIndex};
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+        box-shadow: ${hovering ? '0 0 15px 3px black' : 'none'};
+      `}
+    >
+      {children}
+    </animated.div>
+  )
+}
 
 const ShelfItemTitle = styled.h3`
   color: white;
-  font-size: 1vw;
+  font-size: 1.3rem;
   margin: 0;
+  margin-bottom: 15px;
 `
 
 const ShelfItemDescription = styled.p`
   color: white;
-  font-size: 0.75vw;
+  font-size: 0.8rem;
   margin: 0;
-  margin-top: 5px;
+  margin-bottom: 15px;
 `
+
+const ShelfItemDetails: React.FC<{ hovering: boolean }> = ({ children, hovering }) => {
+  const props = useSpring({ transform: hovering ? 'translateY(0)' : 'translateY(100%)', opacity: hovering ? 1 : 0 })
+  return (
+    <animated.div
+      style={props}
+      css={css`
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 20px 15px;
+        background: ${MAIN_BACKGROUND};
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      `}
+    >
+      {children}
+    </animated.div>
+  )
+}
 
 const ShelfItem = (game: Game) => {
   const [hovering, setHovering] = useState(false)
+  const containerRef = useRef<HTMLLIElement>(null)
+  const [containerSize, setContainerSize] = useState<DOMRect>(null)
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setContainerSize(containerRef.current.getBoundingClientRect())
+    }
+  }, [hovering, containerRef])
 
   return (
     <li
+      ref={containerRef}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       css={css`
         display: block;
         flex: 0 0 calc(100% / 8);
         height: 125px;
-        padding: 0 2.5px;
+        margin: 0 2.5px;
         position: relative;
         @media screen and (max-width: 1099px) and (min-width: 800px) {
           flex-basis: 25%;
         }
       `}
     >
-      <ShelfItemImage {...game} />
-      {hovering && (
-        <Motion defaultStyle={{ x: 0 }} style={{ x: spring(1) }}>
-          {(interpolatedStyles) => (
-            <ShelfItemContent style={{ transform: `scale(${interpolatedStyles.x})` }}>
-              <ShelfItemContentImage {...game} />
-              <ShelfItemDetails>
-                <ShelfItemTitle>{game.name}</ShelfItemTitle>
-                <ShelfItemDescription>{game.short_description}</ShelfItemDescription>
-              </ShelfItemDetails>
-            </ShelfItemContent>
-          )}
-        </Motion>
-      )}
+      <ShelfItemContent hovering={hovering} containerWidth={containerSize?.width || 0}>
+        <ShelfItemImage hovering={hovering} {...game} />
+        <ShelfItemDetails hovering={hovering}>
+          <ShelfItemTitle>{game.name}</ShelfItemTitle>
+          <ShelfItemDescription>{game.short_description}</ShelfItemDescription>
+          <MoreInfoButton to={game.fields.slug} />
+        </ShelfItemDetails>
+      </ShelfItemContent>
     </li>
   )
 }

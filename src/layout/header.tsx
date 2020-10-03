@@ -1,20 +1,47 @@
-import React from 'react'
-import styled from '@emotion/styled'
+import React, { useEffect, useState } from 'react'
 import { css } from '@emotion/core'
 import { Link } from 'gatsby'
+import throttle from 'lodash.throttle'
 
-const Container = styled.header`
-  width: 100%;
-  height: 68px;
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 10%, rgba(0, 0, 0, 0));
-  display: flex;
-  flex-flow: row nowrap;
-  position: sticky;
-  z-index: 99999;
-  top: 0;
-  padding: 0 4%;
-  margin-bottom: -68px;
-`
+const Container: React.FC = ({ children }) => {
+  const [isSticky, setIsSticky] = useState(false)
+  useEffect(() => {
+    const onScroll = throttle(() => {
+      const { top } = document.activeElement.getBoundingClientRect()
+      if (top < 0) {
+        setIsSticky(true)
+      } else if (isSticky) {
+        setIsSticky(false)
+      }
+    }, 50)
+
+    document.addEventListener('scroll', onScroll)
+
+    return () => {
+      document.removeEventListener('scroll', onScroll)
+    }
+  })
+  return (
+    <header
+      style={{ backgroundColor: isSticky ? 'rgb(20, 20, 20)' : 'transparent' }}
+      css={css`
+        width: 100%;
+        height: 68px;
+        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 10%, rgba(0, 0, 0, 0));
+        display: flex;
+        flex-flow: row nowrap;
+        position: sticky;
+        z-index: 3;
+        top: 0;
+        padding: 0 4%;
+        margin-bottom: -68px;
+        transition: background-color 0.4s;
+      `}
+    >
+      {children}
+    </header>
+  )
+}
 
 const HeaderLogo = () => (
   <Link
