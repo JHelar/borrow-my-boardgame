@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from '@emotion/styled'
 import SEO, { Props as SEOProps } from './seo'
 import Header from './header'
 import Footer from './footer'
 import { MAIN_BACKGROUND } from 'src/styles/colors'
 import HomePage from './HomePage'
+import { BodyLockContext } from 'src/contexts'
 
 const Main = styled.main`
   min-height: 100vh;
@@ -12,15 +13,16 @@ const Main = styled.main`
 `
 
 const Layout: React.FC<SEOProps> = ({ children, ...props }) => {
+  const [locked, setLocked] = useState(false)
   return (
-    <>
+    <BodyLockContext.Provider value={{ locked, setLocked }}>
       <SEO {...props} />
       <Header />
       <Main>
         <HomePage>{children}</HomePage>
       </Main>
       <Footer />
-    </>
+    </BodyLockContext.Provider>
   )
 }
 

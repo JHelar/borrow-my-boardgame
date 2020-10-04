@@ -1,6 +1,6 @@
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { MAIN_BACKGROUND } from 'src/styles/colors'
 import { useSpring, animated, config } from 'react-spring'
 import MoreInfoButton from './MoreInfoButton'
@@ -40,18 +40,26 @@ const ShelfItemContent: React.FC<{ hovering: boolean; containerWidth: number }> 
   children,
   containerWidth,
 }) => {
-  const [zIndex, setZIndex] = useState(hovering ? 2 : 1)
+  const [reRender, setReRender] = useState(false)
+  const zIndexRef = useRef(1)
 
-  useEffect(() => {
-    if (hovering) {
-      setZIndex(2)
+  const onAnimationEnd = useCallback(() => {
+    if (!hovering) {
+      // Left
+      zIndexRef.current = 1
+      setReRender(!reRender)
     }
   }, [hovering])
-  const onAnimationEnd = () => {
-    if (!hovering) {
-      setZIndex(1)
+
+  const onAnimationStart = useCallback(() => {
+    if (hovering) {
+      // Entering
+      zIndexRef.current = 3
+    } else {
+      // Leaving
+      zIndexRef.current = 2
     }
-  }
+  }, [hovering])
 
   const props = useSpring({
     height: hovering ? 400 : 125,
@@ -59,12 +67,14 @@ const ShelfItemContent: React.FC<{ hovering: boolean; containerWidth: number }> 
     left: hovering ? -((400 - containerWidth) / 2) : 0,
     top: hovering ? -((400 - 125) / 2) : 0,
     onRest: onAnimationEnd,
+    onStart: onAnimationStart,
   })
   return (
     <animated.div
       style={props}
       css={css`
-        z-index: ${zIndex};
+        z-index: ${zIndexRef.current};
+        min-width: 100%;
         position: absolute;
         width: 100%;
         bottom: 0;
@@ -124,7 +134,7 @@ const ShelfItem = (game: Game) => {
   const containerRef = useRef<HTMLLIElement>(null)
   const [containerSize, setContainerSize] = useState<DOMRect>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (containerRef.current) {
       setContainerSize(containerRef.current.getBoundingClientRect())
     }

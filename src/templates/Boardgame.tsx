@@ -4,6 +4,7 @@ import Layout from 'src/layout'
 import MoreInfoModal from 'src/components/MoreInfoModal'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
+import useBodyLock from 'src/hooks/useBodyLock'
 
 type BoardgameData = {
   data: {
@@ -67,7 +68,7 @@ const Boardgame = ({ data }: BoardgameData) => {
     info: { designer, category },
   } = data.boardgame
   return (
-    <Layout title={`${name}`} lockScroll>
+    <Layout title={`${name}`}>
       <MoreInfoModal>
         <BoardgameImage imageSrc={images.large.src} />
         <BoardgameContent>

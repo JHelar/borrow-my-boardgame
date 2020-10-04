@@ -1,8 +1,9 @@
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { animated, useTransition } from 'react-spring'
 import { navigate } from 'gatsby'
+import useBodyLock from 'src/hooks/useBodyLock'
 
 const ModalContainer = styled.div`
   background-color: #181818;
@@ -16,6 +17,7 @@ const ModalContainer = styled.div`
 `
 
 const MoreInfoModal: React.FC = ({ children }) => {
+  const { setLocked } = useBodyLock()
   const [show, setShow] = useState(true)
   const [{ props, item }] = useTransition(show, null, {
     from: { opacity: 0 },
@@ -24,11 +26,16 @@ const MoreInfoModal: React.FC = ({ children }) => {
     onDestroyed: () => navigate('/'),
   })
 
+  useEffect(() => {
+    setLocked(true)
+  }, [setLocked])
+
   const closeModal = useCallback(() => {
     if (show) {
+      setLocked(false)
       setShow(false)
     }
-  }, [show])
+  }, [show, setLocked])
 
   return (
     item && (
