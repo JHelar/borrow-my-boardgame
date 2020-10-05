@@ -1,4 +1,6 @@
 import { css } from '@emotion/core'
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'gatsby'
 import React from 'react'
 
@@ -26,7 +28,7 @@ const MoreInfoButton: React.FC<{ to: string; style?: React.CSSProperties }> = ({
       }
     `}
   >
-    More info
+    <FontAwesomeIcon icon={faInfoCircle} style={{ marginRight: '.5rem' }} /> More info
   </Link>
 )
 

@@ -11,6 +11,7 @@ const config: GatsbyConfig = {
     keywords: ['gatsby', 'starter', 'gatsby.js', 'template', 'antoine', 'antoinerousseau', 'typescript'],
   },
   plugins: [
+    `gatsby-plugin-fontawesome-css`,
     `gatsby-plugin-emotion`,
     'boardgame-data-plugin',
     {
