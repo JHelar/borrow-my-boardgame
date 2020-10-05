@@ -6,9 +6,11 @@ const getSlugFromNodeContentName = (node: NodeInput['internal']): string => {
   return `/${node.type}/${snakeCase(boardGame.name)}`
 }
 
+const pageTypes = ['boardgame', 'category', 'person', 'mechanic', 'publisher']
+
 const onCreateNode: GatsbyNode['onCreateNode'] = ({ node, actions: { createNodeField } }) => {
   // https://www.gatsbyjs.org/docs/node-apis/#onCreatePage
-  if (node.internal.type === 'boardgame' || node.internal.type === 'category' || node.internal.type === 'person') {
+  if (pageTypes.includes(node.internal.type)) {
     const slug = getSlugFromNodeContentName(node.internal)
     createNodeField({
       node,

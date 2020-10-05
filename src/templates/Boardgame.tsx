@@ -5,7 +5,7 @@ import MoreInfoModal from 'src/components/MoreInfoModal'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUsers, faClock } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faClock, faTrophy } from '@fortawesome/free-solid-svg-icons'
 
 type BoardgameContributor = { name: string; id: string; fields: { slug: string } }
 
@@ -27,6 +27,8 @@ type Boardgame = {
   info: {
     designer: BoardgameContributor[]
     category: BoardgameContributor[]
+    mechanic: BoardgameContributor[]
+    publisher: BoardgameContributor[]
   }
 }
 
@@ -119,10 +121,12 @@ const BoardgameInfo: React.FC<Pick<
         {'+'}
       </span>
       <span>
-        <FontAwesomeIcon icon={faClock} /> {minTime} - {maxTime}m
+        <FontAwesomeIcon icon={faClock} /> {minTime}
+        {maxTime !== minTime && ' - ' + maxTime}m
       </span>
       <span>
-        <FontAwesomeIcon icon={faUsers} /> {minplayers} - {maxplayers}
+        <FontAwesomeIcon icon={faUsers} /> {minplayers}
+        {maxplayers !== minplayers && ' - ' + maxplayers}
       </span>
     </div>
   )
@@ -158,6 +162,9 @@ const ContributorList: React.FC<{ name: string; items: BoardgameContributor[] }>
             color: white;
             text-decoration: none;
             padding-right: 0.3em;
+            &:hover {
+              text-decoration: underline;
+            }
           `}
           to={slug}
         >
@@ -174,7 +181,8 @@ const Boardgame = ({ data }: BoardgameData) => {
     name,
     description,
     images,
-    info: { designer, category },
+    rank,
+    info: { designer, category, mechanic, publisher },
   } = data.boardgame
   return (
     <Layout title={`${name}`}>
@@ -185,11 +193,24 @@ const Boardgame = ({ data }: BoardgameData) => {
         <BoardgameContent>
           <div>
             <BoardgameInfo {...data.boardgame} />
+            {parseInt(rank) <= 10 && (
+              <span
+                css={css`
+                  color: white;
+                  font-size: 16px;
+                  font-weight: 600;
+                `}
+              >
+                <FontAwesomeIcon icon={faTrophy} /> No.{rank} Boardgame of all time
+              </span>
+            )}
             <BoardgameDescription dangerouslySetInnerHTML={{ __html: description }}></BoardgameDescription>
           </div>
           <div>
             <ContributorList name={'Designer'} items={designer} />
             <ContributorList name={'Category'} items={category} />
+            <ContributorList name={'Mechanic'} items={mechanic} />
+            <ContributorList name={'Publisher'} items={publisher} />
           </div>
         </BoardgameContent>
       </MoreInfoModal>
@@ -223,6 +244,20 @@ export const query = graphql`
           }
         }
         category {
+          id
+          name
+          fields {
+            slug
+          }
+        }
+        mechanic {
+          id
+          name
+          fields {
+            slug
+          }
+        }
+        publisher {
           id
           name
           fields {

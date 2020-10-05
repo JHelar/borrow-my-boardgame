@@ -22,6 +22,7 @@ type Game = {
 type GameShelfProps = {
   title: string
   games: Array<Game>
+  wrap?: boolean
 }
 
 const ShelfItemImage = styled.div<Pick<Game, 'images'> & { hovering: boolean }>`
@@ -129,7 +130,7 @@ const ShelfItemDetails: React.FC<{ hovering: boolean }> = ({ children, hovering 
   )
 }
 
-const ShelfItem = (game: Game) => {
+const ShelfItem: React.FC<{ game: Game; wrap: boolean }> = ({ game, wrap }) => {
   const [hovering, setHovering] = useState(false)
   const containerRef = useRef<HTMLLIElement>(null)
   const [containerSize, setContainerSize] = useState<DOMRect>(null)
@@ -149,7 +150,7 @@ const ShelfItem = (game: Game) => {
         display: block;
         flex: 0 0 calc(100% / 8);
         height: 125px;
-        margin: 0 2.5px;
+        margin: ${wrap ? 40 : 0}px 2.5px;
         position: relative;
         @media screen and (max-width: 1099px) and (min-width: 800px) {
           flex-basis: 25%;
@@ -174,12 +175,12 @@ const ShelfContainer = styled.div`
   padding-bottom: 2rem;
 `
 
-const ShelfList = styled.ul`
+const ShelfList = styled.ul<{ wrap: boolean }>`
   list-style: none;
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row ${({ wrap }) => (wrap ? 'wrap' : 'no-wrap')};
   width: 100%;
-  margin: 0 -2.5px;
+  margin: ${({ wrap }) => (wrap ? '-40px -2.5px' : '0 -2.5px')};
   padding: 0;
 `
 
@@ -191,12 +192,12 @@ const ShelfTitle = styled.h2`
   margin-bottom: 0.6rem;
 `
 
-const GameShelf: React.FC<GameShelfProps> = ({ title, games }) => (
+const GameShelf: React.FC<GameShelfProps> = ({ title, games, wrap }) => (
   <ShelfContainer>
     <ShelfTitle>{title}</ShelfTitle>
-    <ShelfList>
+    <ShelfList wrap={wrap}>
       {games.map((game) => (
-        <ShelfItem key={game.id} {...game} />
+        <ShelfItem key={game.id} game={game} wrap={wrap} />
       ))}
     </ShelfList>
   </ShelfContainer>

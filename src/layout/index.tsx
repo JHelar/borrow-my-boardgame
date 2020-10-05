@@ -12,15 +12,13 @@ const Main = styled.main`
   background-color: ${MAIN_BACKGROUND};
 `
 
-const Layout: React.FC<SEOProps> = ({ children, ...props }) => {
+const Layout: React.FC<SEOProps & { noHome?: boolean }> = ({ children, noHome, ...props }) => {
   const [locked, setLocked] = useState(false)
   return (
     <BodyLockContext.Provider value={{ locked, setLocked }}>
       <SEO {...props} />
       <Header />
-      <Main>
-        <HomePage>{children}</HomePage>
-      </Main>
+      <Main>{noHome ? children : <HomePage>{children}</HomePage>}</Main>
       <Footer />
     </BodyLockContext.Provider>
   )

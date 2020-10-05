@@ -15,12 +15,9 @@ type BoardgameResult = {
   allBoardgame: QueryResult
 }
 
-type CategoryResult = {
-  allCategory: QueryResult
-}
-
-type PersonResult = {
-  allPerson: QueryResult
+type ListpageType = 'Person' | 'Category' | 'Mechanic' | 'Publisher'
+type ListpageResult = {
+  [k in string]: QueryResult
 }
 
 const createBoardgamePages = async ({ actions: { createPage }, graphql }: CreatePagesArgs) => {
@@ -48,10 +45,11 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
   })
 }
 
-const createCategoryPages = async ({ actions: { createPage }, graphql }: CreatePagesArgs) => {
-  const categoryResult = await graphql<CategoryResult>(`
+const createListPageForType = async ({ actions: { createPage }, graphql }: CreatePagesArgs, type: ListpageType) => {
+  const nodesName = `all${type}`
+  const personResult = await graphql<ListpageResult>(`
     query {
-      allCategory {
+      ${nodesName} {
         edges {
           node {
             fields {
@@ -62,35 +60,10 @@ const createCategoryPages = async ({ actions: { createPage }, graphql }: CreateP
       }
     }
   `)
-  categoryResult.data.allCategory.edges.forEach(({ node }) => {
+  personResult.data[nodesName].edges.forEach(({ node }) => {
     createPage({
       path: node.fields.slug,
-      component: path.resolve(`./src/templates/Category.tsx`),
-      context: {
-        slug: node.fields.slug,
-      },
-    })
-  })
-}
-
-const createPersonPages = async ({ actions: { createPage }, graphql }: CreatePagesArgs) => {
-  const personResult = await graphql<PersonResult>(`
-    query {
-      allPerson {
-        edges {
-          node {
-            fields {
-              slug
-            }
-          }
-        }
-      }
-    }
-  `)
-  personResult.data.allPerson.edges.forEach(({ node }) => {
-    createPage({
-      path: node.fields.slug,
-      component: path.resolve(`./src/templates/Person.tsx`),
+      component: path.resolve(`./src/templates/${type}Listpage.tsx`),
       context: {
         slug: node.fields.slug,
       },
@@ -100,8 +73,11 @@ const createPersonPages = async ({ actions: { createPage }, graphql }: CreatePag
 
 const createPages: GatsbyNode['createPages'] = async (args) => {
   await createBoardgamePages(args)
-  await createCategoryPages(args)
-  await createPersonPages(args)
+
+  const listpages: Array<ListpageType> = ['Category', 'Mechanic', 'Person', 'Publisher']
+  for (const listpageType of listpages) {
+    await createListPageForType(args, listpageType)
+  }
 }
 
 export default createPages
