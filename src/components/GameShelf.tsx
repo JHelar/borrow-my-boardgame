@@ -2,8 +2,10 @@ import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { MAIN_BACKGROUND } from 'src/styles/colors'
-import { useSpring, animated, config } from 'react-spring'
+import { useSpring, animated, config, AnimatedValue } from 'react-spring'
 import MoreInfoButton from './MoreInfoButton'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 
 type Game = {
   id: string
@@ -36,45 +38,24 @@ const ShelfItemImage = styled.div<Pick<Game, 'images'> & { hovering: boolean }>`
   flex: 1 0 100%;
 `
 
-const ShelfItemContent: React.FC<{ hovering: boolean; containerWidth: number }> = ({
-  hovering,
-  children,
-  containerWidth,
-}) => {
-  const [reRender, setReRender] = useState(false)
-  const zIndexRef = useRef(1)
-
-  const onAnimationEnd = useCallback(() => {
-    if (!hovering) {
-      // Left
-      zIndexRef.current = 1
-      setReRender(!reRender)
-    }
-  }, [hovering])
-
-  const onAnimationStart = useCallback(() => {
-    if (hovering) {
-      // Entering
-      zIndexRef.current = 3
-    } else {
-      // Leaving
-      zIndexRef.current = 2
-    }
-  }, [hovering])
-
+const ShelfItemContent: React.FC<{
+  hovering: boolean
+  containerWidth: number
+  leftEdge?: boolean
+  rightEdge?: boolean
+}> = ({ hovering, children, containerWidth, leftEdge, rightEdge }) => {
   const props = useSpring({
     height: hovering ? 400 : 125,
     width: hovering ? 400 : containerWidth,
-    left: hovering ? -((400 - containerWidth) / 2) : 0,
+    left: hovering && !leftEdge ? (rightEdge ? -(400 - containerWidth) : -((400 - containerWidth) / 2)) : 0,
     top: hovering ? -((400 - 125) / 2) : 0,
-    onRest: onAnimationEnd,
-    onStart: onAnimationStart,
+    zIndex: hovering ? 3 : 1,
+    immediate: (key) => key === 'zIndex',
   })
   return (
     <animated.div
       style={props}
       css={css`
-        z-index: ${zIndexRef.current};
         min-width: 100%;
         position: absolute;
         width: 100%;
@@ -130,16 +111,22 @@ const ShelfItemDetails: React.FC<{ hovering: boolean }> = ({ children, hovering 
   )
 }
 
-const ShelfItem: React.FC<{ game: Game; wrap: boolean }> = ({ game, wrap }) => {
+const ShelfItem: React.FC<{
+  game: Game
+  wrap: boolean
+  leftEdge?: boolean
+  rightEdge?: boolean
+  containerSize: DOMRect | null
+  setContainerSize: (rect: DOMRect) => void
+}> = ({ game, wrap, leftEdge, rightEdge, containerSize, setContainerSize }) => {
   const [hovering, setHovering] = useState(false)
   const containerRef = useRef<HTMLLIElement>(null)
-  const [containerSize, setContainerSize] = useState<DOMRect>(null)
 
   useLayoutEffect(() => {
-    if (containerRef.current) {
+    if (containerRef.current && !containerSize) {
       setContainerSize(containerRef.current.getBoundingClientRect())
     }
-  }, [hovering, containerRef])
+  }, [hovering, containerRef, containerSize, setContainerSize])
 
   return (
     <li
@@ -157,7 +144,12 @@ const ShelfItem: React.FC<{ game: Game; wrap: boolean }> = ({ game, wrap }) => {
         }
       `}
     >
-      <ShelfItemContent hovering={hovering} containerWidth={containerSize?.width || 0}>
+      <ShelfItemContent
+        hovering={hovering}
+        containerWidth={containerSize?.width || 0}
+        leftEdge={leftEdge}
+        rightEdge={rightEdge}
+      >
         <ShelfItemImage hovering={hovering} {...game} />
         <ShelfItemDetails hovering={hovering}>
           <ShelfItemTitle>{game.name}</ShelfItemTitle>
@@ -175,14 +167,46 @@ const ShelfContainer = styled.div`
   padding-bottom: 2rem;
 `
 
-const ShelfList = styled.ul<{ wrap: boolean }>`
-  list-style: none;
-  display: flex;
-  flex-flow: row ${({ wrap }) => (wrap ? 'wrap' : 'no-wrap')};
-  width: 100%;
-  margin: ${({ wrap }) => (wrap ? '-40px -2.5px' : '0 -2.5px')};
-  padding: 0;
-`
+const ShelfList: React.FC<{ wrap: boolean; transition: AnimatedValue<any> }> = ({ wrap, children, transition }) => {
+  const [hovering, setHovering] = useState(false)
+  return (
+    <div style={{ marginRight: 'calc(100% / 13 * -1)' }}>
+      <animated.ul
+        onMouseEnter={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+        style={transition}
+        css={`
+          list-style: none;
+          display: flex;
+          flex-flow: row ${wrap ? 'wrap' : 'no-wrap'};
+          width: 100%;
+          margin: ${wrap ? '-40px -2.5px' : '0 -2.5px'};
+          padding: 0;
+          z-index: ${hovering ? 1 : 0};
+          position: relative;
+        `}
+      >
+        {children}
+      </animated.ul>
+    </div>
+  )
+}
+
+const ShelfListWrapper: React.FC = ({ children }) => {
+  const [hovering, setHovering] = useState(false)
+  return (
+    <div
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      css={`
+        z-index: ${hovering ? 1 : 0};
+        position: relative;
+      `}
+    >
+      {children}
+    </div>
+  )
+}
 
 const ShelfTitle = styled.h2`
   color: white;
@@ -192,15 +216,78 @@ const ShelfTitle = styled.h2`
   margin-bottom: 0.6rem;
 `
 
-const GameShelf: React.FC<GameShelfProps> = ({ title, games, wrap }) => (
-  <ShelfContainer>
-    <ShelfTitle>{title}</ShelfTitle>
-    <ShelfList wrap={wrap}>
-      {games.map((game) => (
-        <ShelfItem key={game.id} game={game} wrap={wrap} />
-      ))}
-    </ShelfList>
-  </ShelfContainer>
+const ShelfScrollButton: React.FC<{ onClick: () => void; isRight?: boolean }> = ({ children, onClick, isRight }) => (
+  <button
+    onClick={() => onClick()}
+    css={css`
+      position: absolute;
+      right: ${isRight ? 0 : 'auto'};
+      left: ${!isRight ? '-4.25%' : 'auto'};
+      background: linear-gradient(to ${isRight ? 'right' : 'left'}, rgba(20, 20, 20, 0.25), rgba(20, 20, 20, 0.5));
+      border: 0;
+      border-radius: 0;
+      top: 0;
+      bottom: 0;
+      width: calc(${100 / 8 / 2}% - ${16 * 2.5}px);
+      z-index: 2;
+      outline: 0;
+      padding: 0;
+      > svg {
+        display: none;
+      }
+      &:hover {
+        background-color: rgba(20, 20, 20, 0.8);
+
+        > svg {
+          display: inline-block;
+        }
+      }
+    `}
+  >
+    <FontAwesomeIcon
+      icon={isRight ? faChevronRight : faChevronLeft}
+      css={css`
+        color: white;
+        font-size: 55px;
+      `}
+    />
+  </button>
 )
+
+const GameShelf: React.FC<GameShelfProps> = ({ title, games, wrap }) => {
+  const [containerSize, setContainerSize] = useState<DOMRect>(null)
+  const stepsRef = useRef(games.length - 7)
+  const [carouselStep, setCarouselStep] = useState(0)
+  const transitionSpring = useSpring({
+    transform: `translateX(-${carouselStep * (containerSize?.width + 2.5 * 2 || 0)}px)`,
+  })
+  return (
+    <ShelfContainer>
+      <ShelfTitle>{title}</ShelfTitle>
+      <ShelfListWrapper>
+        <ShelfScrollButton
+          onClick={() => (carouselStep > 0 ? setCarouselStep(carouselStep - 1) : setCarouselStep(stepsRef.current - 1))}
+        />
+        <ShelfList wrap={wrap} transition={transitionSpring}>
+          {games.map((game, index) => (
+            <ShelfItem
+              containerSize={containerSize}
+              setContainerSize={setContainerSize}
+              key={game.id}
+              game={game}
+              wrap={wrap}
+              leftEdge={index % 8 === carouselStep}
+              rightEdge={index % 8 === (6 + carouselStep) % 8}
+            />
+          ))}
+        </ShelfList>
+        <ShelfScrollButton
+          isRight
+          onClick={() => (carouselStep < stepsRef.current ? setCarouselStep(carouselStep + 1) : setCarouselStep(0))}
+        />
+      </ShelfListWrapper>
+    </ShelfContainer>
+  )
+}
 
 export default GameShelf

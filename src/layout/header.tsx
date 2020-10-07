@@ -31,7 +31,7 @@ const Container: React.FC = ({ children }) => {
         display: flex;
         flex-flow: row nowrap;
         position: sticky;
-        z-index: 3;
+        z-index: 4;
         top: 0;
         padding: 0 4%;
         margin-bottom: -68px;
