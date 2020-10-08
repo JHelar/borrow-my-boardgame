@@ -6,10 +6,12 @@ import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUsers, faClock, faTrophy } from '@fortawesome/free-solid-svg-icons'
+import RentGameButton from 'src/components/RentGameButton'
 
 type BoardgameContributor = { name: string; id: string; fields: { slug: string } }
 
 type Boardgame = {
+  id: string
   name: string
   description: string
   minage: string
@@ -72,15 +74,23 @@ const BoardgameContent = styled.div`
   display: grid;
 `
 
-const BoardgameTitle = styled.h1`
+const BoardgameHeaderContent = styled.div`
   position: absolute;
   bottom: 0.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 3rem;
+  padding-bottom: 40px;
+`
+
+const BoardgameTitle = styled.h1`
   margin: 0;
   font-size: 55px;
   font-weight: bold;
+  margin-bottom: 20px;
   line-height: 1;
   color: white;
-  padding: 0 3rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45);
 `
 
@@ -178,17 +188,22 @@ const ContributorList: React.FC<{ name: string; items: BoardgameContributor[] }>
 
 const Boardgame = ({ data }: BoardgameData) => {
   const {
+    id,
     name,
     description,
     images,
     rank,
     info: { designer, category, mechanic, publisher },
   } = data.boardgame
+
   return (
     <Layout title={`${name}`}>
       <MoreInfoModal>
         <BoardgameImage imageSrc={images.large.src}>
-          <BoardgameTitle>{name}</BoardgameTitle>
+          <BoardgameHeaderContent>
+            <BoardgameTitle>{name}</BoardgameTitle>
+            <RentGameButton gameId={id} />
+          </BoardgameHeaderContent>
         </BoardgameImage>
         <BoardgameContent>
           <div>
@@ -221,6 +236,7 @@ const Boardgame = ({ data }: BoardgameData) => {
 export const query = graphql`
   query($slug: String!) {
     boardgame(fields: { slug: { eq: $slug } }) {
+      id
       name
       description
       minage

@@ -256,35 +256,73 @@ const ShelfScrollButton: React.FC<{ onClick: () => void; isRight?: boolean }> = 
 
 const GameShelf: React.FC<GameShelfProps> = ({ title, games, wrap }) => {
   const [containerSize, setContainerSize] = useState<DOMRect>(null)
-  const stepsRef = useRef(games.length - 7)
   const [carouselStep, setCarouselStep] = useState(0)
+  const [rewindToStart, setRewindToStart] = useState(false)
+  const maxSteps = 7
+  const gamesRef = useRef(games)
+  const beenScrolled = useRef(false)
+  const stepsRef = useRef(games.length - maxSteps)
+  const transitionRest = useCallback(() => {
+    if (rewindToStart) {
+      setCarouselStep(0)
+      setRewindToStart(false)
+      gamesRef.current = [...games]
+    }
+  }, [rewindToStart, games])
   const transitionSpring = useSpring({
-    transform: `translateX(-${carouselStep * (containerSize?.width + 2.5 * 2 || 0)}px)`,
+    transform: rewindToStart
+      ? `translateX(-${(containerSize?.width + 5) * (maxSteps + 3) || 0}px)`
+      : `translateX(-${carouselStep * (containerSize?.width + 2.5 * 2 || 0)}px)`,
+    onRest: transitionRest,
+    immediate: (key) => carouselStep === 0 && !rewindToStart && key === 'transform',
   })
+
+  const rightButtonClick = () => {
+    if (carouselStep < stepsRef.current) {
+      setCarouselStep(carouselStep + 1)
+
+      // Put the carouselStep item to back of games
+      gamesRef.current = [...gamesRef.current, games[carouselStep]]
+    } else {
+      // Rewind to start
+      // Set rest of games to the array
+      const addSteps = maxSteps - carouselStep
+      gamesRef.current = [...gamesRef.current, ...games.slice(carouselStep, carouselStep + addSteps + 1)]
+      setRewindToStart(true)
+    }
+    beenScrolled.current = true
+  }
   return (
     <ShelfContainer>
       <ShelfTitle>{title}</ShelfTitle>
       <ShelfListWrapper>
-        <ShelfScrollButton
-          onClick={() => (carouselStep > 0 ? setCarouselStep(carouselStep - 1) : setCarouselStep(stepsRef.current - 1))}
-        />
+        {!wrap && beenScrolled.current && (
+          <ShelfScrollButton
+            onClick={() =>
+              carouselStep > 0 ? setCarouselStep(carouselStep - 1) : setCarouselStep(stepsRef.current - 1)
+            }
+          />
+        )}
         <ShelfList wrap={wrap} transition={transitionSpring}>
-          {games.map((game, index) => (
-            <ShelfItem
-              containerSize={containerSize}
-              setContainerSize={setContainerSize}
-              key={game.id}
-              game={game}
-              wrap={wrap}
-              leftEdge={index % 8 === carouselStep}
-              rightEdge={index % 8 === (6 + carouselStep) % 8}
-            />
-          ))}
+          {gamesRef.current.map((game, index) => {
+            const leftEdge = wrap ? index % maxSteps === 0 : index % (maxSteps + 1) === carouselStep
+            const rightEdge = wrap
+              ? index % maxSteps === 6
+              : index % (maxSteps + 1) === (maxSteps - 1 + carouselStep) % (maxSteps + 1)
+            return (
+              <ShelfItem
+                containerSize={containerSize}
+                setContainerSize={setContainerSize}
+                key={index + game.id}
+                game={game}
+                wrap={wrap}
+                leftEdge={leftEdge}
+                rightEdge={rightEdge}
+              />
+            )
+          })}
         </ShelfList>
-        <ShelfScrollButton
-          isRight
-          onClick={() => (carouselStep < stepsRef.current ? setCarouselStep(carouselStep + 1) : setCarouselStep(0))}
-        />
+        {!wrap && <ShelfScrollButton isRight onClick={rightButtonClick} />}
       </ShelfListWrapper>
     </ShelfContainer>
   )

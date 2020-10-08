@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { css } from '@emotion/core'
 import { Link } from 'gatsby'
 import throttle from 'lodash.throttle'
+import UserAvatar from 'src/components/UserAvatar'
 
 const Container: React.FC = ({ children }) => {
   const [isSticky, setIsSticky] = useState(false)
+
   useEffect(() => {
     const onScroll = throttle(() => {
       const { top } = document.activeElement.getBoundingClientRect()
@@ -30,6 +32,8 @@ const Container: React.FC = ({ children }) => {
         background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 10%, rgba(0, 0, 0, 0));
         display: flex;
         flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-between;
         position: sticky;
         z-index: 4;
         top: 0;
@@ -39,6 +43,7 @@ const Container: React.FC = ({ children }) => {
       `}
     >
       {children}
+      <UserAvatar />
     </header>
   )
 }

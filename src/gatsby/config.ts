@@ -11,6 +11,21 @@ const config: GatsbyConfig = {
     keywords: ['gatsby', 'starter', 'gatsby.js', 'template', 'antoine', 'antoinerousseau', 'typescript'],
   },
   plugins: [
+    {
+      resolve: 'gatsby-plugin-firebase',
+      options: {
+        credentials: {
+          apiKey: 'AIzaSyCCvTBOXmIXXpSjR0SrwsiPA5KiQeQecHY',
+          authDomain: 'borrow-my-boardgame.firebaseapp.com',
+          databaseURL: 'https://borrow-my-boardgame.firebaseio.com',
+          projectId: 'borrow-my-boardgame',
+          storageBucket: 'borrow-my-boardgame.appspot.com',
+          messagingSenderId: '983643279668',
+          appId: '1:983643279668:web:ffd4371811ac27abebd561',
+          measurementId: 'G-46D8BT4X34',
+        },
+      },
+    },
     `gatsby-plugin-fontawesome-css`,
     `gatsby-plugin-emotion`,
     'boardgame-data-plugin',

@@ -1,6 +1,6 @@
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { animated, useTransition } from 'react-spring'
 import { navigate } from 'gatsby'
 import useBodyLock from 'src/hooks/useBodyLock'
@@ -14,6 +14,8 @@ const ModalContainer = styled.div`
   margin: 2em;
   border-radius: 6px;
   overflow: hidden;
+  position: relative;
+  z-index: 5;
 `
 
 const MoreInfoModal: React.FC = ({ children }) => {
@@ -25,17 +27,22 @@ const MoreInfoModal: React.FC = ({ children }) => {
     leave: { opacity: 0 },
     onDestroyed: () => navigate('/'),
   })
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setLocked(true)
   }, [setLocked])
 
-  const closeModal = useCallback(() => {
-    if (show) {
-      setLocked(false)
-      setShow(false)
-    }
-  }, [show, setLocked])
+  const closeModal = useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      const clickedInside = containerRef.current.contains(event.target as Node)
+      if (show && !clickedInside) {
+        setLocked(false)
+        setShow(false)
+      }
+    },
+    [show, setLocked]
+  )
 
   return (
     item && (
@@ -56,7 +63,7 @@ const MoreInfoModal: React.FC = ({ children }) => {
         `}
         onClick={closeModal}
       >
-        <ModalContainer>{children}</ModalContainer>
+        <ModalContainer ref={containerRef}>{children}</ModalContainer>
       </animated.div>
     )
   )
