@@ -270,12 +270,21 @@ const GameShelf: React.FC<GameShelfProps> = ({ title, games, wrap }) => {
     }
   }, [rewindToStart, games])
   const transitionSpring = useSpring({
-    transform: rewindToStart
+    transform: wrap
+      ? 'translateX(0px)'
+      : rewindToStart
       ? `translateX(-${(containerSize?.width + 5) * (maxSteps + 3) || 0}px)`
       : `translateX(-${carouselStep * (containerSize?.width + 2.5 * 2 || 0)}px)`,
     onRest: transitionRest,
     immediate: (key) => carouselStep === 0 && !rewindToStart && key === 'transform',
   })
+
+  useEffect(() => {
+    gamesRef.current = games
+    if (wrap) {
+      setCarouselStep(carouselStep + 1)
+    }
+  }, [games])
 
   const rightButtonClick = () => {
     if (carouselStep < stepsRef.current) {

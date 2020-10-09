@@ -10,7 +10,7 @@ const Container = styled.footer`
 `
 
 const Footer: React.FC = () => {
-  return <Container>Footer</Container>
+  return <Container></Container>
 }
 
 export default Footer

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { css } from '@emotion/core'
 import { Link } from 'gatsby'
 import throttle from 'lodash.throttle'
-import UserAvatar from 'src/components/UserAvatar'
+import UserActions, { SearchFieldProps } from 'src/components/UserActions'
 
-const Container: React.FC = ({ children }) => {
+const Container: React.FC<SearchFieldProps> = ({ children, ...searchFieldProps }) => {
   const [isSticky, setIsSticky] = useState(false)
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const Container: React.FC = ({ children }) => {
       `}
     >
       {children}
-      <UserAvatar />
+      <UserActions {...searchFieldProps} />
     </header>
   )
 }
@@ -66,9 +66,9 @@ const HeaderLogo = () => (
   </Link>
 )
 
-const Header: React.FC = () => {
+const Header: React.FC<SearchFieldProps> = (props) => {
   return (
-    <Container>
+    <Container {...props}>
       <HeaderLogo />
     </Container>
   )

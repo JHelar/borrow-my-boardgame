@@ -7,19 +7,26 @@ import { MAIN_BACKGROUND } from 'src/styles/colors'
 import HomePage from './HomePage'
 import { BodyLockContext } from 'src/contexts'
 import GameModal from './GameModal'
+import { SearchFieldProps } from 'src/components/UserActions'
 
 const Main = styled.main`
   min-height: 100vh;
   background-color: ${MAIN_BACKGROUND};
 `
 
-const Layout: React.FC<SEOProps & { noHome?: boolean }> = ({ children, noHome, ...props }) => {
+const Layout: React.FC<SEOProps & { noHome?: boolean } & SearchFieldProps> = ({
+  children,
+  noHome,
+  defaultQuery,
+  expandByDefault,
+  ...props
+}) => {
   const [locked, setLocked] = useState(false)
   return (
     <BodyLockContext.Provider value={{ locked, setLocked }}>
       <SEO {...props} />
       <GameModal>
-        <Header />
+        <Header defaultQuery={defaultQuery} expandByDefault={expandByDefault} />
         <Main>{noHome ? children : <HomePage>{children}</HomePage>}</Main>
         <Footer />
       </GameModal>

@@ -51,6 +51,9 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
               large {
                 src
               }
+              medium {
+                src
+              }
             }
             info {
               designer {
@@ -90,7 +93,7 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
       }
     }
   `)
-  if (false) {
+  if (true) {
     const firebaseData = boardgameResult.data.allBoardgame.edges.reduce(
       (acc, { node }) => ({ ...acc, [node.id]: { ...node } }),
       {}

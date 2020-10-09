@@ -32,10 +32,20 @@ const ListpageTitle = styled.h1`
   padding: 0 4%;
 `
 
+const ListpageSubTitle = styled.h2`
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: white;
+  margin: 0;
+  padding: 0 4%;
+`
+
 const Listpage: React.FC<ListpageData> = ({ name, boardgame }) => (
   <ListpageContainer>
     <ListpageTitle>{name}</ListpageTitle>
-    <GameShelf games={boardgame} title={''} wrap />
+    {boardgame.length && <GameShelf games={boardgame} title={''} wrap />}
+    {!boardgame.length && <ListpageSubTitle>Nothing to see here!</ListpageSubTitle>}
   </ListpageContainer>
 )
 
