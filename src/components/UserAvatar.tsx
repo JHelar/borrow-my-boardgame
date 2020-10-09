@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import React, { useState } from 'react'
 import useAuth from 'src/hooks/useAuth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faAngleUp, faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
+import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
 import { css } from '@emotion/core'
 
 const CTAButton = styled.button`

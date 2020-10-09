@@ -18,14 +18,14 @@ const ModalContainer = styled.div`
   z-index: 5;
 `
 
-const MoreInfoModal: React.FC = ({ children }) => {
+const MoreInfoModal: React.FC<{ onClose: () => void }> = ({ children, onClose }) => {
   const { setLocked } = useBodyLock()
   const [show, setShow] = useState(true)
   const [{ props, item }] = useTransition(show, null, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
-    onDestroyed: () => navigate('/'),
+    onDestroyed: onClose,
   })
   const containerRef = useRef<HTMLDivElement>(null)
 

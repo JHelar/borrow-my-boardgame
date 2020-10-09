@@ -6,6 +6,7 @@ import Footer from './footer'
 import { MAIN_BACKGROUND } from 'src/styles/colors'
 import HomePage from './HomePage'
 import { BodyLockContext } from 'src/contexts'
+import GameModal from './GameModal'
 
 const Main = styled.main`
   min-height: 100vh;
@@ -17,9 +18,11 @@ const Layout: React.FC<SEOProps & { noHome?: boolean }> = ({ children, noHome, .
   return (
     <BodyLockContext.Provider value={{ locked, setLocked }}>
       <SEO {...props} />
-      <Header />
-      <Main>{noHome ? children : <HomePage>{children}</HomePage>}</Main>
-      <Footer />
+      <GameModal>
+        <Header />
+        <Main>{noHome ? children : <HomePage>{children}</HomePage>}</Main>
+        <Footer />
+      </GameModal>
     </BodyLockContext.Provider>
   )
 }

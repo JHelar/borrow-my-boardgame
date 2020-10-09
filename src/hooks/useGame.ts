@@ -2,33 +2,18 @@ import firebase from 'gatsby-plugin-firebase'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useObjectVal } from 'react-firebase-hooks/database'
 import useAuth from './useAuth'
-import useGames, { Game } from './useGames'
+import { Game } from './useGames'
 
-const useGame = (gameId: string): [game: Game, rent: () => void, renting: boolean] => {
+const useGame = (gameId?: string): [game: Game, rent: () => void, renting: boolean, returnGame: () => void] => {
   const [_, user] = useAuth()
-  const gameRef = useRef(firebase.database().ref('games/' + gameId))
-  const [game, loading, error] = useObjectVal<Game>(gameRef.current)
+  const gameRef = firebase.database().ref('games/' + gameId)
+  const [game, loading, error] = useObjectVal<Game>(gameRef)
   const [renting, setRenting] = useState(false)
-  const games = useGames()
-  useEffect(() => {
-    if (!game && !loading && games) {
-      firebase
-        .database()
-        .ref('games')
-        .set({
-          ...games,
-          [gameId]: {
-            rented: false,
-            rentedBy: null,
-          },
-        })
-    }
-  }, [game, games, gameId, loading])
 
   const rentGame = useCallback(() => {
-    if (game) {
+    if (game && !renting) {
       setRenting(true)
-      gameRef.current.set(
+      gameRef.update(
         {
           rented: true,
           rentedBy: user.uid,
@@ -38,9 +23,24 @@ const useGame = (gameId: string): [game: Game, rent: () => void, renting: boolea
         }
       )
     }
-  }, [game, user])
+  }, [game, user, renting, gameRef])
 
-  return [game, rentGame, renting]
+  const giveBackGame = useCallback(() => {
+    if (game && !renting) {
+      setRenting(true)
+      gameRef.set(
+        {
+          rented: false,
+          rentedBy: null,
+        },
+        (rentError) => {
+          setRenting(false)
+        }
+      )
+    }
+  }, [game, renting, gameRef])
+
+  return [gameId && game, rentGame, renting, giveBackGame]
 }
 
 export default useGame

@@ -154,7 +154,7 @@ const ShelfItem: React.FC<{
         <ShelfItemDetails hovering={hovering}>
           <ShelfItemTitle>{game.name}</ShelfItemTitle>
           <ShelfItemDescription>{game.short_description}</ShelfItemDescription>
-          <MoreInfoButton to={game.fields.slug} />
+          <MoreInfoButton gameId={game.id} />
         </ShelfItemDetails>
       </ShelfItemContent>
     </li>

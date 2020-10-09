@@ -122,7 +122,7 @@ const TopGame: React.FC = () => {
         <TopGameTitle>{data.topGame.name}</TopGameTitle>
         <TopGameSubtitle>No.1 Boardgame of all time</TopGameSubtitle>
         <TopGameDescription>{data.topGame.short_description}</TopGameDescription>
-        <MoreInfoButton style={{ marginTop: '1vw' }} to={data.topGame.fields.slug} />
+        <MoreInfoButton style={{ marginTop: '1vw' }} gameId={data.topGame.id} />
       </TopGameContent>
       <MinAge {...data.topGame} />
     </TopGameWrapper>

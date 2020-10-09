@@ -1,5 +1,8 @@
 import path from 'path'
 import { CreatePagesArgs, GatsbyNode } from 'gatsby'
+import firebase from 'firebase'
+import 'firebase/database'
+import { Boardgame } from 'src/components/BoardgameModal'
 
 type QueryResult = {
   edges: {
@@ -12,7 +15,15 @@ type QueryResult = {
 }
 
 type BoardgameResult = {
-  allBoardgame: QueryResult
+  allBoardgame: {
+    edges: {
+      node: {
+        fields: {
+          slug: string
+        }
+      } & Boardgame
+    }[]
+  }
 }
 
 type ListpageType = 'Person' | 'Category' | 'Mechanic' | 'Publisher'
@@ -26,6 +37,51 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
       allBoardgame {
         edges {
           node {
+            id
+            name
+            description
+            minage
+            minplayers
+            maxplayers
+            minplaytime
+            maxplaytime
+            yearpublished
+            rank
+            images {
+              large {
+                src
+              }
+            }
+            info {
+              designer {
+                name
+                id
+                fields {
+                  slug
+                }
+              }
+              category {
+                id
+                name
+                fields {
+                  slug
+                }
+              }
+              mechanic {
+                id
+                name
+                fields {
+                  slug
+                }
+              }
+              publisher {
+                id
+                name
+                fields {
+                  slug
+                }
+              }
+            }
             fields {
               slug
             }
@@ -34,6 +90,21 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
       }
     }
   `)
+  if (false) {
+    const firebaseData = boardgameResult.data.allBoardgame.edges.reduce(
+      (acc, { node }) => ({ ...acc, [node.id]: { ...node } }),
+      {}
+    )
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    firebase.initializeApp(require(path.resolve(__dirname, '../../.firebase-creds')))
+    try {
+      const gamesRef = firebase.database().ref('games')
+      await gamesRef.set(JSON.parse(JSON.stringify(firebaseData)))
+      console.log('Wrote games to firebase')
+    } catch (firebaseError) {
+      console.log({ firebaseError })
+    }
+  }
   boardgameResult.data.allBoardgame.edges.forEach(({ node }) => {
     createPage({
       path: node.fields.slug,
