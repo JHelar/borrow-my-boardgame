@@ -6,9 +6,10 @@ import React from 'react'
 import BoardgameModal from 'src/components/BoardgameModal'
 
 const GameModal: React.FC = ({ children }) => {
+  const isBrowser = typeof window !== `undefined`
   const prevLocation = useRef({
-    path: location.pathname,
-    title: document.title,
+    path: isBrowser && location.pathname,
+    title: isBrowser && document.title,
   })
   const [show, setShow] = useState(false)
   const gameIdRef = useRef<string | null>(null)

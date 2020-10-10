@@ -1,5 +1,6 @@
 import type { GatsbyConfig } from 'gatsby'
 import path from 'path'
+import firebaseCreds from '../firebase-creds'
 
 const config: GatsbyConfig = {
   siteMetadata: {
@@ -43,7 +44,7 @@ const config: GatsbyConfig = {
       resolve: 'gatsby-plugin-firebase',
       options: {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        credentials: require(path.resolve(__dirname, '../../.firebase-creds')).appCreds,
+        credentials: firebaseCreds.appCreds,
       },
     },
     `gatsby-plugin-fontawesome-css`,

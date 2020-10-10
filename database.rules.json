@@ -1,0 +1,13 @@
+{
+  "rules": {
+    "games": {
+      ".read": true,
+      ".write": "auth.uid != null",
+      ".indexOn": ["name"]
+    },
+    "users": {
+      ".read": true,
+      ".write": "auth.uid != null"
+    }
+  }
+}

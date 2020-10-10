@@ -1,6 +1,5 @@
 import firebase from 'gatsby-plugin-firebase'
-import { useAuthState } from 'react-firebase-hooks/auth'
-import { useObjectVal } from 'react-firebase-hooks/database'
+import useAuthState from './useAuthState'
 
 const login = () => {
   firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
@@ -17,7 +16,7 @@ const useAuth = (): [
   login: () => void,
   logout: () => void
 ] => {
-  const [user, loading, error] = useAuthState(firebase.auth())
+  const [user, loading, error] = useAuthState(firebase)
 
   return [!!user, user, loading, login, logout]
 }

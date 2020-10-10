@@ -27,7 +27,7 @@
     "develop": "export NODE_ENV=develop && gatsby clean && gatsby develop",
     "lint": "tsc --skipLibCheck && eslint --fix \"**/*.{ts,tsx,js,jsx,json}\"",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "build": "gatsby clean && gatsby build",
+    "build": "export NODE_ENV=production && gatsby clean && gatsby build",
     "serve": "gatsby serve",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing \" && exit 1",
     "clean": "gatsby clean"

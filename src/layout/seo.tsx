@@ -29,7 +29,13 @@ const SEO: React.FC<Props> = ({ title, noindex, description, url, image, lockScr
   const { locked } = useBodyLock()
   const htmlAttr = {
     lang: data.locale.substr(0, 2),
-    style: locked ? 'overflow: hidden' : 'overflow-x: hidden',
+    style: ((locked
+      ? {
+          overflow: 'hidden',
+        }
+      : {
+          overflowX: 'hidden',
+        }) as any) as string,
   }
   const pageTitle = title ? `${title} | ${data.title}` : data.title
 

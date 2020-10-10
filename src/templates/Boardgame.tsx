@@ -5,7 +5,7 @@ import BoardgameModal, { BoardgameData } from 'src/components/BoardgameModal'
 
 const Boardgame = (props: BoardgameData) => {
   return (
-    <Layout title={`${name}`}>
+    <Layout title={`${props.data.boardgame.name}`}>
       <BoardgameModal {...props} onClose={() => navigate('/')} />
     </Layout>
   )

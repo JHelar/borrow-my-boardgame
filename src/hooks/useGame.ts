@@ -1,17 +1,18 @@
 import firebase from 'gatsby-plugin-firebase'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useObjectVal } from 'react-firebase-hooks/database'
+import { useObjectVal, useObject } from 'react-firebase-hooks/database'
 import useAuth from './useAuth'
 import { Game } from './useGames'
 
 const useGame = (gameId?: string): [game: Game, rent: () => void, renting: boolean, returnGame: () => void] => {
   const [_, user] = useAuth()
   const userRef = useRef(null)
-  const gameRef = firebase.database().ref('games/' + gameId)
-  const [game, loading, error] = useObjectVal<Game>(gameRef)
+  const gameRef = useRef(null)
+  const [game, loading, error] = useObjectVal<Game>(firebase.database().ref('games/' + gameId))
   const [renting, setRenting] = useState(false)
 
   useEffect(() => {
+    gameRef.current = firebase.database().ref('games/' + gameId)
     if (user) {
       userRef.current = firebase.database().ref('users/' + user.uid)
     }
@@ -20,7 +21,7 @@ const useGame = (gameId?: string): [game: Game, rent: () => void, renting: boole
   const rentGame = useCallback(() => {
     if (game && !renting && user) {
       setRenting(true)
-      gameRef.update(
+      gameRef.current.update(
         {
           rented: true,
           rentedBy: user.uid,
@@ -50,7 +51,7 @@ const useGame = (gameId?: string): [game: Game, rent: () => void, renting: boole
   const giveBackGame = useCallback(() => {
     if (game && !renting) {
       setRenting(true)
-      gameRef.update(
+      gameRef.current.update(
         {
           rented: false,
           rentedBy: null,

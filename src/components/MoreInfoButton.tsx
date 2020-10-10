@@ -13,7 +13,7 @@ const MoreInfoButton: React.FC<{ gameId: string; style?: React.CSSProperties }> 
     <>
       <button
         onClick={onShowModal}
-        style={style}
+        style={{ ...style }}
         role="button"
         css={css`
           border: 0;

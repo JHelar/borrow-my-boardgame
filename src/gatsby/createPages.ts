@@ -3,6 +3,7 @@ import { CreatePagesArgs, GatsbyNode } from 'gatsby'
 import firebase from 'firebase'
 import 'firebase/database'
 import { Boardgame } from 'src/components/BoardgameModal'
+import firebaseCreds from '../firebase-creds'
 
 type QueryResult = {
   edges: {
@@ -99,7 +100,7 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
       {}
     )
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { appCreds, writerCreds } = require(path.resolve(__dirname, '../../.firebase-creds'))
+    const { appCreds, writerCreds } = firebaseCreds
     firebase.initializeApp(appCreds)
     try {
       await firebase.auth().signInWithEmailAndPassword(writerCreds.username, writerCreds.password)

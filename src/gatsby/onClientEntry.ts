@@ -1,6 +1,3 @@
-import 'firebase/auth'
-import 'firebase/database'
-
 import type { GatsbyBrowser } from 'gatsby'
 
 const onClientEntry: GatsbyBrowser['onClientEntry'] = () => {
