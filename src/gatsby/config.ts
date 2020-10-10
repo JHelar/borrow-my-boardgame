@@ -11,9 +11,39 @@ const config: GatsbyConfig = {
   },
   plugins: [
     {
+      resolve: 'gatsby-plugin-local-search',
+      options: {
+        name: 'games',
+        engine: 'flexsearch',
+        query: `
+          {
+            allBoardgame {
+              edges {
+                node {
+                  id
+                  name
+                  short_description
+                }
+              }
+            }
+          }
+        `,
+        ref: 'id',
+        index: ['name', 'description'],
+        store: ['id'],
+        normalizer: ({ data }) =>
+          data.allBoardgame.edges.map(({ node }) => ({
+            id: node.id,
+            name: node.name,
+            description: node.short_description,
+          })),
+      },
+    },
+    {
       resolve: 'gatsby-plugin-firebase',
       options: {
-        credentials: require(path.resolve(__dirname, '../../.firebase-creds')),
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        credentials: require(path.resolve(__dirname, '../../.firebase-creds')).appCreds,
       },
     },
     `gatsby-plugin-fontawesome-css`,

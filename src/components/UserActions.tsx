@@ -4,8 +4,10 @@ import useAuth from 'src/hooks/useAuth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretUp, faDice, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { css } from '@emotion/core'
-import { Link, navigate } from 'gatsby'
+import { Link } from 'gatsby'
+import { navigate } from '@reach/router'
 import { animated, useSpring } from 'react-spring'
+import debounce from 'lodash.debounce'
 
 const CTAButton = styled.button`
   background-color: #e50914;
@@ -50,6 +52,14 @@ const UserActionWrapper = styled.div`
   align-items: center;
 `
 
+const navigateToSearch = debounce((query: string) => {
+  if (query) {
+    navigate('/search?query=' + query)
+  } else {
+    navigate('/')
+  }
+}, 50)
+
 export type SearchFieldProps = { expandByDefault?: boolean; defaultQuery?: string }
 
 const SearchField: React.FC<SearchFieldProps> = ({ expandByDefault, defaultQuery }) => {
@@ -67,11 +77,7 @@ const SearchField: React.FC<SearchFieldProps> = ({ expandByDefault, defaultQuery
 
   const onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.currentTarget.value
-    navigate('/search', {
-      state: {
-        query,
-      },
-    })
+    navigateToSearch(query)
   }
 
   return (
@@ -155,7 +161,7 @@ const UserActions: React.FC<SearchFieldProps> = (props) => {
   }
   return (
     <UserActionWrapper>
-      <SearchField />
+      <SearchField {...props} />
       <Link
         to={'/renting'}
         state={{

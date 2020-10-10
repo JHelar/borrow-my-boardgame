@@ -1,39 +1,56 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Listpage from 'src/components/Listpage'
 import useBodyLock from 'src/hooks/useBodyLock'
 import Layout from 'src/layout'
-import firebase from 'gatsby-plugin-firebase'
-import { useObjectVal } from 'react-firebase-hooks/database'
+import { useFlexSearch } from 'react-use-flexsearch'
+import { graphql } from 'gatsby'
+import useGames from 'src/hooks/useGames'
+import queryString from 'query-string'
 
 type SearchPageState = {
   query?: string
 }
 
-const RentingPage: GatsbyPage<unknown, unknown, SearchPageState> = ({ location: { state } }) => {
+type SearchPageData = {
+  localSearchGames: {
+    index: string
+    store: string
+  }
+}
+
+const RentingPage: GatsbyPage<SearchPageData, unknown, SearchPageState> = ({
+  location,
+  data: {
+    localSearchGames: { index, store },
+  },
+}) => {
   const { setLocked } = useBodyLock()
-  const [query, setQuery] = useState((state && state.query) || '')
-  const [boardgames, loading] = useObjectVal<any[]>(
-    firebase
-      .database()
-      .ref('games')
-      .orderByChild('name')
-      .startAt(query.toUpperCase())
-      .endAt(query.toLowerCase() + '\uf8ff')
-  )
-  console.log({
-    boardgames,
-  })
+  const query = (location.search && (queryString.parse(location.search).query as string)) || ''
+  const results = useFlexSearch(query, index, store)
+  const [boardgames, setBoardgames] = useState([])
+  const games = useGames()
+
   useEffect(() => {
-    if (state && state.query) {
-      setQuery(state.query)
+    if (games) {
+      setBoardgames(results.map(({ id }) => games[id]))
     }
-  }, [state])
+  }, [results, games])
+
   setLocked(false)
   return (
-    <Layout title="Search" noHome defaultQuery={query} expandByDefault={query ? true : false}>
-      <Listpage name={`Results for "${query}"`} boardgame={boardgames || []} />
+    <Layout title="Search" noHome defaultQuery={query} expandByDefault={true}>
+      <Listpage name={`Results for "${query}"`} boardgame={boardgames} />
     </Layout>
   )
 }
+
+export const query = graphql`
+  query {
+    localSearchGames {
+      index
+      store
+    }
+  }
+`
 
 export default RentingPage

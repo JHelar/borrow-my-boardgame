@@ -99,8 +99,10 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
       {}
     )
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    firebase.initializeApp(require(path.resolve(__dirname, '../../.firebase-creds')))
+    const { appCreds, writerCreds } = require(path.resolve(__dirname, '../../.firebase-creds'))
+    firebase.initializeApp(appCreds)
     try {
+      await firebase.auth().signInWithEmailAndPassword(writerCreds.username, writerCreds.password)
       const gamesRef = firebase.database().ref('games')
       await gamesRef.set(JSON.parse(JSON.stringify(firebaseData)))
       console.log('Wrote games to firebase')

@@ -6,6 +6,7 @@ import { useSpring, animated, config, AnimatedValue } from 'react-spring'
 import MoreInfoButton from './MoreInfoButton'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import throttle from 'lodash.throttle'
 
 type Game = {
   id: string
