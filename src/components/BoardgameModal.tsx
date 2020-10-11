@@ -93,7 +93,7 @@ const BoardgameTitle = styled.h1`
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45);
 `
 
-const BoardgameDescription = styled.p`
+const BoardgameDescription = styled.div`
   line-height: 27px;
   font-size: 18px;
   color: white;
