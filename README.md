@@ -1,15 +1,14 @@
-# gatsby-starter-antoine
+# BmB - Borrow my boardgame
 
-My opinionated [Gatsby.js](https://www.gatsbyjs.org/) starter template.
+A gatsby driven JAM stack site with Firebase as serverless database.
+Hosted on Firebase at: https://borrow-my-boardgame.web.app/
 
-It starts from [the default Gatsby starter](https://github.com/gatsbyjs/gatsby-starter-default), and adds:
+## Description
 
-- [Hot reloading](https://github.com/hot-loader/react-dom)
-- [TypeScript](https://www.typescriptlang.org/) & Gatsby types
-- [Eslint](https://eslint.org/) & [Prettier](https://prettier.io/)
-- [Bugsnag](https://www.bugsnag.com/)
-- [Styled Components](https://styled-components.com/)
-- `src` [import alias](https://medium.com/@justintulk/solve-module-import-aliasing-for-webpack-jest-and-vscode-74007ce4adc9)
+Hobby project to test JAM stack and staticly generated website development.
+Wanted to also test and wirte a plugin to data scrape another website for data to my project.
+
+The front end is completely made by me from scratch using emotion css to create styled components with Netflix as main design inspiration.
 
 ## Requirements
 
@@ -32,8 +31,6 @@ And configure your site infos in `package.json` and `src/gatsby/config.ts`.
 - `yarn build`: make production bundle
 - `yarn serve`: locally serve production bundle
 
-## Netlify
+## Firebase
 
-If you use [Netlify](https://www.netlify.com/), you can also directly have a TypeScript-ready setup, including Netlify functions (lambdas), by using [the netlify branch](https://github.com/antoinerousseau/gatsby-starter-antoine/tree/netlify), e.g.:
-
-    gatsby new [name] https://github.com/antoinerousseau/gatsby-starter-antoine#netlify
+- `firebase deploy`
