@@ -28,6 +28,8 @@ type HomePageData = {
   topGames: GameShelfData
   adventureGames: GameShelfData
   cooperativeGames: GameShelfData
+  trainGames: GameShelfData
+  cardGames: GameShelfData
 }
 //height: 56.25vw;
 const GameShelfs = styled.div`
@@ -98,6 +100,53 @@ const HomePage: React.FC = ({ children }) => {
           }
         }
       }
+      trainGames: allBoardgame(
+        filter: { info: { category: { elemMatch: { name: { regex: "/Trains/" } } } } }
+        sort: { fields: rank, order: ASC }
+        limit: 10
+      ) {
+        edges {
+          node {
+            name
+            id
+            short_description
+            images {
+              medium {
+                src
+              }
+            }
+            fields {
+              slug
+            }
+          }
+        }
+      }
+      cardGames: allBoardgame(
+        filter: { info: { category: { elemMatch: { name: { eq: "Card Game" } } } } }
+        sort: { fields: rank, order: ASC }
+        limit: 10
+      ) {
+        edges {
+          node {
+            name
+            id
+            short_description
+            images {
+              medium {
+                src
+              }
+            }
+            fields {
+              slug
+            }
+            info {
+              category {
+                name
+              }
+            }
+          }
+        }
+      }
     }
   `)
   return (
@@ -107,6 +156,8 @@ const HomePage: React.FC = ({ children }) => {
         <GameShelf games={data.topGames.edges.map((edge) => edge.node)} title="Top boardgames" />
         <GameShelf games={data.adventureGames.edges.map((edge) => edge.node)} title="Top Adventure games" />
         <GameShelf games={data.cooperativeGames.edges.map((edge) => edge.node)} title="Top Co-op games" />
+        <GameShelf games={data.cardGames.edges.map((edge) => edge.node)} title="Card games" />
+        <GameShelf games={data.trainGames.edges.map((edge) => edge.node)} title="Train games" />
       </GameShelfs>
       {children}
     </>

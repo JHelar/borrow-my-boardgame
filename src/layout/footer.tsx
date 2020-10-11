@@ -7,6 +7,8 @@ const Container = styled.footer`
   min-height: 400px;
   background: ${MAIN_BACKGROUND};
   padding: 0 4%;
+  display: grid;
+  grid-template-areas: . content .;
 `
 
 const Footer: React.FC = () => {

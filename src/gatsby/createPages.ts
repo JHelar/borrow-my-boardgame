@@ -41,6 +41,7 @@ const createBoardgamePages = async ({ actions: { createPage }, graphql }: Create
             id
             name
             description
+            short_description
             minage
             minplayers
             maxplayers

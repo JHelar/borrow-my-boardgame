@@ -77,7 +77,7 @@ export const getBoardGameLinks = async function* (): AsyncGenerator<{
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36'
     )
     let pageNo = 1
-    const limit = process.env.NODE_ENV === 'develop' ? 2 : 10
+    const limit = process.env.NODE_ENV === 'develop' ? 2 : 20
     while (pageNo <= limit) {
       const saveExists = saveGamesExists(pageNo)
       if (saveExists) {

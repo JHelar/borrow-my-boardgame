@@ -1,11 +1,11 @@
-import type { GatsbyBrowser } from "gatsby"
+import type { GatsbyBrowser } from 'gatsby'
 
-import React from "react"
-import styled, { createGlobalStyle } from "styled-components"
+import React from 'react'
+import styled, { createGlobalStyle } from 'styled-components'
 
-import normalize from "./normalize"
-import style from "./style"
-import { ErrorBoundary } from "src/helpers/bugsnag"
+import normalize from './normalize'
+import style from './style'
+import { ErrorBoundary } from 'src/helpers/bugsnag'
 
 const GlobalStyles = createGlobalStyle`
   ${normalize}
@@ -37,7 +37,7 @@ const ErrorComponent: React.FC<FallbackProps> = () => (
   </ErrorContainer>
 )
 
-const Page: GatsbyBrowser["wrapPageElement"] = ({ element }) => {
+const Page: GatsbyBrowser['wrapPageElement'] = ({ element }) => {
   // https://www.gatsbyjs.org/docs/browser-apis/#wrapPageElement
   return (
     <>

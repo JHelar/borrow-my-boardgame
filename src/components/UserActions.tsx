@@ -1,13 +1,14 @@
 import styled from '@emotion/styled'
-import React, { useCallback, useReducer, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import useAuth from 'src/hooks/useAuth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretUp, faDice, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { css } from '@emotion/core'
 import { Link } from 'gatsby'
-import { navigate } from '@reach/router'
+import { navigate } from 'gatsby'
 import { animated, useSpring } from 'react-spring'
 import debounce from 'lodash.debounce'
+import useSearch from 'src/hooks/useSearch'
 
 const CTAButton = styled.button`
   background-color: #e50914;
@@ -52,17 +53,10 @@ const UserActionWrapper = styled.div`
   align-items: center;
 `
 
-const navigateToSearch = debounce((query: string) => {
-  if (query) {
-    navigate('/search?query=' + query)
-  } else {
-    navigate('/')
-  }
-}, 50)
-
 export type SearchFieldProps = { expandByDefault?: boolean; defaultQuery?: string }
 
 const SearchField: React.FC<SearchFieldProps> = ({ expandByDefault, defaultQuery }) => {
+  const { setQuery } = useSearch()
   const [expanded, setExpanded] = useState(expandByDefault)
   const inputRef = useRef<HTMLInputElement>(null)
   const inputWidth = useSpring({
@@ -74,6 +68,27 @@ const SearchField: React.FC<SearchFieldProps> = ({ expandByDefault, defaultQuery
       }
     },
   })
+
+  useEffect(() => {
+    if (defaultQuery) {
+      console.log('SETTING DEFAULT')
+      setQuery(defaultQuery)
+    }
+  }, [defaultQuery, setQuery])
+
+  const navigateToSearch = debounce((query: string) => {
+    if (query) {
+      navigate('/search?query=' + query, {
+        state: {
+          query,
+        },
+        replace: true,
+      })
+      setQuery(query)
+    } else {
+      navigate('/')
+    }
+  }, 50)
 
   const onQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.currentTarget.value

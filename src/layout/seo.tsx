@@ -1,7 +1,6 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { useStaticQuery, graphql } from 'gatsby'
-import useBodyLock from 'src/hooks/useBodyLock'
 
 export interface Props {
   title?: string
@@ -11,7 +10,7 @@ export interface Props {
   image?: string
 }
 
-const SEO: React.FC<Props> = ({ title, noindex, description, url, image, lockScroll }) => {
+const SEO: React.FC<Props> = ({ title, noindex, description, url, image }) => {
   const {
     site: { siteMetadata: data },
   } = useStaticQuery(graphql`
@@ -26,16 +25,8 @@ const SEO: React.FC<Props> = ({ title, noindex, description, url, image, lockScr
       }
     }
   `)
-  const { locked } = useBodyLock()
   const htmlAttr = {
     lang: data.locale.substr(0, 2),
-    style: ((locked
-      ? {
-          overflow: 'hidden',
-        }
-      : {
-          overflowX: 'hidden',
-        }) as any) as string,
   }
   const pageTitle = title ? `${title} | ${data.title}` : data.title
 

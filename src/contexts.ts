@@ -18,3 +18,14 @@ export const GameModalContext = createContext({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   display: (gameId: string) => {},
 } as GameModalContextType)
+
+export type SearchContextType = {
+  query: string
+  setQuery: (query: string) => void
+}
+
+export const SearchContext = createContext<SearchContextType>({
+  query: '',
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setQuery: () => {},
+})

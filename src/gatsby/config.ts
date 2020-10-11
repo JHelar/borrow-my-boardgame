@@ -24,19 +24,41 @@ const config: GatsbyConfig = {
                   id
                   name
                   short_description
+                  info {
+                    category {
+                      name
+                    }
+                    artist {
+                      name
+                    }
+                    designer {
+                      name
+                    }
+                    mechanic {
+                      name
+                    }
+                    publisher {
+                      name
+                    }
+                  }
                 }
               }
             }
           }
         `,
         ref: 'id',
-        index: ['name', 'description'],
+        index: ['name', 'description', 'categories', 'artist', 'designer', 'mechanic', 'publisher'],
         store: ['id'],
         normalizer: ({ data }) =>
           data.allBoardgame.edges.map(({ node }) => ({
             id: node.id,
             name: node.name,
             description: node.short_description,
+            categories: node.info.category.map(({ name }) => name),
+            artist: node.info.artist.map(({ name }) => name),
+            designer: node.info.designer.map(({ name }) => name),
+            mechanic: node.info.mechanic.map(({ name }) => name),
+            publisher: node.info.publisher.map(({ name }) => name),
           })),
       },
     },
