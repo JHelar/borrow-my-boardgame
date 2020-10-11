@@ -6,7 +6,7 @@ Hosted on Firebase at: https://borrow-my-boardgame.web.app/
 ## Description
 
 Hobby project to test JAM stack and staticly generated website development.
-Wanted to also test and wirte a plugin to data scrape another website for data to my project.
+As datasource I created a gatsby source plugin to scrape another site for boardgame data and assets.
 
 The front end is completely made by me from scratch using emotion css to create styled components with Netflix as main design inspiration.
 
